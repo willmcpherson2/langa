@@ -1,0 +1,38 @@
+cabal-version: 2.4
+name: myc
+version: 0.1.0.0
+
+common common
+  default-language: Haskell2010
+  default-extensions:
+    LambdaCase
+    RankNTypes
+    ScopedTypeVariables
+    PolyKinds
+  ghc-options:
+    -Weverything
+    -Wno-implicit-prelude
+    -Wno-name-shadowing
+    -Wno-unsafe
+    -Wno-missing-import-lists
+    -Wno-unused-do-bind
+    -Wno-missed-specialisations
+    -Wno-all-missed-specialisations
+    -Wno-monomorphism-restriction
+    -Wno-missing-local-signatures
+    -Wno-safe
+  if impl(ghc >= 8.8.1)
+    ghc-options: -Wno-missing-deriving-strategies
+  if impl(ghc >= 8.10)
+    ghc-options: -Wno-prepositive-qualified-module
+  if impl(ghc >= 8.10.1)
+    ghc-options: -Wno-missing-safe-haskell-mode
+
+executable myc
+  import: common
+  hs-source-dirs: app
+  main-is: Main.hs
+  build-depends:
+    base
+    , parss
+    , language-javascript

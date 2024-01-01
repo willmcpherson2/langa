@@ -1,0 +1,6 @@
+source-repository-package
+  type: git
+  location: https://github.com/willmcpherson2/parss
+  tag: a47bcecf9453eea2d108b8d3f9f51ada245ce951
+
+packages: ./myc.cabal

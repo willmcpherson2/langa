@@ -1,0 +1,51 @@
+null
+undefined
+true
+false
+1
+1n
+"a"
+[a b]
+{a b}
+  {... a}
+
+(-> a b)
+  (-> (, a b) c)
+(? a b)
+(do a b)
+(, a b)
+
+a
+(a b)
+  (a (, b c))
+(new a b)
+(. a b)
+(... a)
+(= a b c)
+(= a b)
+(import a b)
+
+---
+
+(\+|\-)?(\d+|NaN|Infinity)
+(\+|\-)?\d+n
+".*"
+
+a
+(a b)
+[a b]
+{a b}
+
+null
+undefined
+true
+false
+...
+->
+,
+?
+do
+new
+.
+=
+import
