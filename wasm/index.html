@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>WASM</title>
+  </head>
+  <body>
+    <script>
+      function logBuffer(offset, length) {
+        const string = readMemoryAsUnicode(offset, length);
+        console.log(string);
+      }
+
+      function readMemoryAsUnicode(offset, length) {
+        const bytes = new Uint8Array(memory.buffer, offset, length);
+        const string = new TextDecoder().decode(bytes);
+        return string;
+      }
+
+      const memory = new WebAssembly.Memory({ initial: 1 });
+
+      const imports = {
+        imports: {
+          log: console.log,
+          logBuffer,
+          memory,
+          getMagic: multiplier => multiplier * 42,
+        },
+      };
+
+      WebAssembly.instantiateStreaming(fetch("main.wasm"), imports).then(
+        (obj) => {
+          obj.instance.exports.main();
+        },
+      );
+    </script>
+  </body>
+</html>

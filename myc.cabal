@@ -27,11 +27,15 @@ common common
     ghc-options: -Wno-prepositive-qualified-module
   if impl(ghc >= 8.10.1)
     ghc-options: -Wno-missing-safe-haskell-mode
+  if impl(ghc >= 9.2)
+    ghc-options: -Wno-missing-kind-signatures
 
 executable myc
   import: common
   hs-source-dirs: app
   main-is: Main.hs
+  other-modules:
+    Token
   build-depends:
     base
     , parss

@@ -1,0 +1,50 @@
+(module
+  (import "imports" "log" (func $log (param i32)))
+  (import "imports" "logBuffer" (func $logBuffer (param i32 i32)))
+  (import "imports" "getMagic" (func $getMagic (param i32) (result i32)))
+  (import "imports" "memory" (memory 1))
+
+  ;; "привет 😁"
+  (data (i32.const 0) "\D0\BF\D1\80\D0\B8\D0\B2\D0\B5\D1\82\20\F0\9F\98\81")
+
+  (func $main (export "main")
+    (call $logBuffer (i32.const 0) (i32.const 17))
+    (call $logBuffer (i32.const 17) (i32.const 19))
+    (call $writeStuff)
+    (call $logBuffer (i32.const 0) (i32.const 17))
+    (call $logBuffer (i32.const 17) (i32.const 19))
+  )
+
+  ;; Writes "Vær så snill 🙂" as UTF-8 to memory, starting from offset 17
+  ;; UTF-8 code units: 56 C3 A6 72 20 73 C3 A5 20 73 6E 69 6C 6C 20 F0 9F 99 82
+  (func $writeStuff (export "writeStuff")
+    (i32.store8 (i32.const 17) (i32.const 0x56))
+    (i32.store8 (i32.const 18) (i32.const 0xC3))
+    (i32.store8 (i32.const 19) (i32.const 0xA6))
+    (i32.store8 (i32.const 20) (i32.const 0x72))
+    (i32.store8 (i32.const 21) (i32.const 0x20))
+    (i32.store8 (i32.const 22) (i32.const 0x73))
+    (i32.store8 (i32.const 23) (i32.const 0xC3))
+    (i32.store8 (i32.const 24) (i32.const 0xA5))
+    (i32.store8 (i32.const 25) (i32.const 0x20))
+    (i32.store8 (i32.const 26) (i32.const 0x73))
+    (i32.store8 (i32.const 27) (i32.const 0x6E))
+    (i32.store8 (i32.const 28) (i32.const 0x69))
+    (i32.store8 (i32.const 29) (i32.const 0x6C))
+    (i32.store8 (i32.const 30) (i32.const 0x6C))
+    (i32.store8 (i32.const 31) (i32.const 0x20))
+    (i32.store8 (i32.const 32) (i32.const 0xF0))
+    (i32.store8 (i32.const 33) (i32.const 0x9F))
+    (i32.store8 (i32.const 34) (i32.const 0x99))
+    (i32.store8 (i32.const 35) (i32.const 0x82))
+  )
+
+  (func $fac (param $n i32) (result i32)
+    (if
+      (result i32)
+      (i32.eq (local.get $n) (i32.const 0))
+      (i32.const 1)
+      (i32.mul (local.get $n) (call $fac (i32.sub (local.get $n) (i32.const 1))))
+    )
+  )
+)

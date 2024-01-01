@@ -1,51 +1,165 @@
-null
-undefined
-true
-false
-1
-1n
-"a"
-[a b]
-{a b}
-  {... a}
+i32
+i64
+  42
+  -42
+  +42
 
-(-> a b)
-  (-> (, a b) c)
-(? a b)
-(do a b)
-(, a b)
-
-a
-(a b)
-  (a (, b c))
-(new a b)
-(. a b)
-(... a)
-(= a b c)
-(= a b)
-(import a b)
+f32
+f64
+  42
+  -42
+  +42
+  3.14
+  inf
+  nan
 
 ---
 
-(\+|\-)?(\d+|NaN|Infinity)
-(\+|\-)?\d+n
-".*"
+(module ...)
 
-a
-(a b)
-[a b]
-{a b}
+(import "imports" "name" (func $name (param type ...) (result type)))
+(import "imports" "memory" (memory 1))
 
-null
-undefined
-true
-false
+(data (type.const literal) literal)
+
+(func $name (param $name type) ... (result type) body)
+(call $name arg ...)
+(return value)
+
+(local.get $name)
+(local.set $name)
+
+(type.load (i32.const offset))
+(type.store (i32.const offset) value)
+
+(if type cond then else)
+
+(type.const literal)
+(type.eq a b)
+(type.add a b)
 ...
-->
-,
-?
-do
-new
-.
-=
-import
+
+---
+
+term
+  42
+  3.14
+  'a'
+  "ab"
+  name
+  [term term]
+  (-> pat term)
+  (? pat term)
+  (term term)
+  (do pat term)
+  (= pat term term)
+  {type term}
+
+pat
+  42
+  3.14
+  'a'
+  "ab"
+  name
+  [pat pat]
+
+type
+  42
+  3.14
+  'a'
+  "ab"
+  [type type]
+  (=> type type)
+  Int
+  Float
+  Char
+  (Do type)
+  (Set type type)
+  Type
+  (Type n)
+
+module
+  item ...
+
+item
+  (import [name [name name]])
+  (export [name name])
+  (action name type)
+  (= name term)
+
+---
+
+{42 42}
+{Int 42}
+
+{Float 3.14}
+{3.14 3.14}
+
+{'a' 'a'}
+{Char 'a'}
+
+{['a' 'b'] ['a' 'b']}
+{"ab" "ab"}
+{(List Char) "ab"}
+{String "ab"}
+
+{(Do 0) (log "a")}
+{(Do Char) get}
+{(Do 0) (do char get (log char))}
+
+{(-> 'a' Char) (-> 'a' 'b')}
+
+{(-> (Set 1 0) (Set 0 1)) (? 1 0 0 1)}
+
+{Int (= x 1 x)}
+
+{(forall a (-> a a)) (-> x x)}
+
+{(forall a (-> a [a a])) (-> x [x x])}
+
+(= List (-> a
+            (Set 0 [a (List a)]))
+   map { (forall a b (-> (-> a b) (List a) (List b)))
+         (-> f
+             (? 0 0
+                [x xs] [(f x) (map f xs)])) }
+   zero-to-one {(-> 0 1) (-> 0 1)}
+   {(List 1) (map zero-to-one [0 0 0])})
+
+{(Set 0 1) 0}
+{Type (Set 0 1)}
+{(-> Type Type) (-> a (Set a a))}
+{Type1 (-> Type Type)}
+
+---
+
+(action log (-> String 0))
+
+(action get String)
+
+(do _ (log "a")
+    (log "b"))
+
+(= log-a (log "a")
+   log-b (log "b")
+   (do _ log-a
+       log-b))
+
+(= log-twice (-> x (do (log x)
+                       _ (log x)))
+   (log-twice "a"))
+
+(= log-twice (-> x (do _ (log x)
+                       (log x)))
+   (do _ (log-twice "a")
+       (log-twice "a")))
+
+(= log-forever (do _ (log "a")
+                   (log-forever))
+   (log-forever))
+
+(do _ (log "a")
+    get)
+
+(do char get
+    (log char))
