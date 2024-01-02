@@ -1,68 +1,70 @@
 module Ast
   ( Ast,
-    Module,
     Item (..),
     Exp (..),
     Type (..),
     Pat (..),
-    Lit (..),
     parseAst,
   )
 where
 
+import Parss.Combinators
+import Parss.Parser
 import Token
 import Tree
 
+type Match = [Tree]
+
+type Source = ([Tree], [Tree])
+
 type Loc = Tree
 
-type Ast = Module
-
-type Module = [Item]
+type Ast = [Item] -- item*
 
 data Item
-  = Import [(Name, [Name])] Loc
-  | Declare [(Name, Exp)] Loc
-  | Export [Name] Loc
-  | Def Name Exp Loc
+  = Import Name [Name] Loc -- (<- module name*)
+  | Export [Name] Loc -- (-> name*)
+  | Declare Name Exp Loc -- {name type}
+  | Def Name Exp Loc -- (= name exp)
   deriving (Show)
 
 data Exp
-  = ExpType Type Loc
-  | ExpLit Lit Loc
-  | ExpVar Name Loc
-  | ExpCons Exp Exp Loc
-  | ExpFun Pat Exp Loc
-  | ExpCase Pat Exp Loc
-  | ExpApp Exp Exp Loc
-  | ExpDo Pat Exp Exp Loc
-  | ExpLet Pat Exp Exp Loc
-  | ExpTyped Exp Exp Loc
+  = ExpData (Data Exp) Loc -- data
+  | ExpType Type Loc -- type
+  | ExpTyped Exp Exp Loc -- {type exp}
+  | ExpFun Pat Exp Loc -- (-> pat+ exp)
+  | ExpCase Exp Exp Loc -- (? exp exp+)
+  | ExpApp Exp Exp Loc -- (exp exp+)
+  | ExpDo Pat Exp Exp Loc -- (do (pat exp)+ exp)
+  | ExpLet Pat Exp Exp Loc -- (= (pat exp)+ exp)
   deriving (Show)
 
 data Type
-  = TypeKind Exp Loc
-  | TypeSet Exp Exp Loc
-  | TypeFor Name Exp Loc
-  | TypeFun Exp Exp Loc
-  | TypeDo Exp Loc
-  | TypeStr Loc
-  | TypeChar Loc
-  | TypeFloat Loc
-  | TypeInt Loc
+  = TypeStr Loc -- String
+  | TypeChar Loc -- Char
+  | TypeFloat Loc -- Float
+  | TypeInt Loc -- Int
+  | TypeFun Exp Exp Loc -- (=> type type+)
+  | TypeDo Exp Loc -- (Do type)
+  | TypeSet Exp Exp Loc -- (Set type type+)
+  | TypeFor Name Exp Loc -- (For name+ type)
+  | TypeKind Exp Loc -- (Type n)
   deriving (Show)
 
-data Pat
-  = PatLit Lit Loc
-  | PatVar Name Loc
-  | PatCons Pat Pat Loc
+newtype Pat = Pat (Data Pat) -- pat
   deriving (Show)
 
-data Lit
-  = LitStr String Loc
-  | LitChar Char Loc
-  | LitFloat Name Loc
-  | LitInt Name Loc
+data Data a
+  = DataCons a a Loc -- [data data+]
+  | DataStr String Loc -- "foo"
+  | DataChar Char Loc -- 'a
+  | DataFloat Name Loc -- 3.14
+  | DataInt Name Loc -- 42
+  | DataVar Name Loc -- x
   deriving (Show)
 
 parseAst :: [Tree] -> Ast
-parseAst = undefined
+parseAst = parse (many parseItem) . ([],)
+
+parseItem :: Parser Match Source (Maybe Item)
+parseItem = _
