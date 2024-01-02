@@ -3,12 +3,9 @@ name: myc
 version: 0.1.0.0
 
 common common
-  default-language: Haskell2010
+  default-language: GHC2021
   default-extensions:
     LambdaCase
-    RankNTypes
-    ScopedTypeVariables
-    PolyKinds
   ghc-options:
     -Weverything
     -Wno-implicit-prelude
@@ -36,7 +33,8 @@ executable myc
   main-is: Main.hs
   other-modules:
     Token
+    , Tree
+    , Ast
   build-depends:
     base
     , parss
-    , language-javascript

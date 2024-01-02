@@ -1,10 +1,11 @@
-module Token (Match, Source, Loc, Token (..), parseTokens) where
+module Token (Name, Token (..), parseTokens) where
 
 import Control.Monad (void)
 import Data.Char (isDigit, isSpace)
 import Data.List.NonEmpty
 import Parss.Combinators
 import Parss.Parser
+import Parss.Stream
 import Parss.Trans
 
 type Match = String
@@ -12,6 +13,8 @@ type Match = String
 type Source = (String, String)
 
 type Loc = (String, String, String)
+
+type Name = NonEmpty Char
 
 data Token
   = TokOpenParen Loc
@@ -21,30 +24,30 @@ data Token
   | TokOpenBrace Loc
   | TokCloseBrace Loc
   | TokStr String Loc
-  | TokFloat (NonEmpty Char) Loc
-  | TokInt (NonEmpty Char) Loc
-  | TokVar (NonEmpty Char) Loc
-  | TokSpace Loc
-  deriving (Eq, Show)
+  | TokChar Char Loc
+  | TokFloat Name Loc
+  | TokInt Name Loc
+  | TokVar Name Loc
+  deriving (Show)
 
-parseTokens :: Parser Match Source [Token]
-parseTokens = many parseToken
+parseTokens :: String -> [Token]
+parseTokens = parse (many parseToken) . ("",)
 
 parseToken :: Parser Match Source (Maybe Token)
-parseToken =
-  parseSeparator
+parseToken = do
+  parseSpace
+  parseParen
     <|> try parseStr
+    <|> try parseChar
     <|> try parseFloat
     <|> try parseInt
     <|> try parseVar
 
-parseSeparator :: Parser Match Source (Maybe Token)
-parseSeparator = try parseSpace <|> parseParen
+parseSeparator :: Parser Match Source (Maybe ())
+parseSeparator = try parseSpace <|> void <$> parseParen
 
-parseSpace :: Parser Match Source (Maybe Token)
-parseSpace = locateM . fallible $ do
-  need $ try $ satisfy isSpace
-  pure TokSpace
+parseSpace :: Parser Match Source (Maybe ())
+parseSpace = void <$> try (satisfy isSpace)
 
 parseParen :: Parser Match Source (Maybe Token)
 parseParen =
@@ -94,6 +97,12 @@ parseStr = locateM . fallible $ do
   need $ try $ string close
   pure $ TokStr $ concat str
 
+parseChar :: Parser Match Source (Maybe Token)
+parseChar = locateM . fallible $ do
+  need $ try $ is '\''
+  char <- need stream
+  pure $ TokChar char
+
 parseFloat :: Parser Match Source (Maybe Token)
 parseFloat = locateM . fallible $ do
   sign <- ok parseSign
@@ -109,14 +118,14 @@ parseInt = locateM . fallible $ do
   nat <- need parseNat
   pure $ TokInt $ maybe nat (<> nat) sign
 
-parseSign :: Parser Match Source (Maybe (NonEmpty Char))
+parseSign :: Parser Match Source (Maybe Name)
 parseSign = try (string $ '+' :| "") <|> try (string $ '-' :| "")
 
-parseNat :: Parser Match Source (Maybe (NonEmpty Char))
+parseNat :: Parser Match Source (Maybe Name)
 parseNat = some $ try $ satisfy isDigit
 
 parseVar :: Parser Match Source (Maybe Token)
 parseVar = locateM . fallible $ do
-  notSep <- need $ some $ try $ neg $ void <$> parseSeparator <|> void <$> end
+  notSep <- need $ some $ try $ neg $ parseSeparator <|> void <$> end
   var <- need $ pure $ nonEmpty $ concat notSep
   pure $ TokVar var

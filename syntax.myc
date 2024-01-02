@@ -41,51 +41,48 @@ f64
 
 ---
 
-term
-  42
-  3.14
-  'a'
-  "ab"
-  name
-  [term term]
-  (-> pat term)
-  (? pat term)
-  (term term)
-  (do pat term)
-  (= pat term term)
-  {type term}
-
-pat
-  42
-  3.14
-  'a'
-  "ab"
-  name
-  [pat pat]
-
-type
-  42
-  3.14
-  'a'
-  "ab"
-  [type type]
-  (=> type type)
-  Int
-  Float
-  Char
-  (Do type)
-  (Set type type)
-  Type
-  (Type n)
-
 module
   item ...
 
 item
-  (import [name [name name]])
-  (export [name name])
-  (action name type)
-  (= name term)
+  (import name (name name))
+  (declare name exp)
+  (export name)
+  (= name exp)
+
+exp
+  type
+  lit
+  name
+  [exp exp]
+  (-> pat exp)
+  (? pat exp)
+  (exp exp)
+  (do pat exp exp)
+  (= pat exp exp)
+  {exp exp}
+
+type
+  (Type n)
+  (Set exp exp)
+  (For name exp)
+  (=> exp exp)
+  (Do exp)
+  String
+  Char
+  Float
+  Int
+
+pat
+  lit
+  name
+  [pat pat]
+
+lit
+  "ab"
+  'a'
+  3.14
+  42
 
 ---
 
