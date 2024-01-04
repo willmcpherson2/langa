@@ -17,10 +17,10 @@ type Loc = ([Token], [Token], [Token])
 type Ast = [Item] -- item*
 
 data Item
-  = Import Name [Name] Loc -- (<- module name*)
-  | Export [Name] Loc -- (-> name*)
-  | Declare Name Exp Loc -- {name type}
-  | Def Name Exp Loc -- (= name exp)
+  = Import Var [Var] Loc -- (<- module name*)
+  | Export [Var] Loc -- (-> name*)
+  | Declare Var Exp Loc -- {name type}
+  | Def Var Exp Loc -- (= name exp)
   | ItemErr Err
   deriving (Show)
 
@@ -44,7 +44,7 @@ data Type
   | TypeFun Exp Exp Loc -- (=> type type+)
   | TypeDo Exp Loc -- (Do type)
   | TypeSet Exp Exp Loc -- (Set type type+)
-  | TypeFor Name Exp Loc -- (For name+ type)
+  | TypeFor Var Exp Loc -- (For name+ type)
   | TypeKind Exp Loc -- (Type n)
   | TypeErr Err
   deriving (Show)
@@ -64,11 +64,16 @@ data Data a
   | DataErr Err
   deriving (Show)
 
+data Var
+  = Var Name Loc
+  | VarErr Err
+  deriving (Show)
+
 data Err
   = ErrNoItem Loc
   | ErrNoExp Loc
   | ErrNoPat Loc
-  | ErrForNoName Loc
+  | ErrNoVar Loc
   | ErrEmptyImport Loc
   | ErrEmptyExport Loc
   | ErrEmptyDeclare Loc
@@ -227,14 +232,11 @@ parseType = \case
     Just $ case trees of
       [] -> TypeErr $ ErrEmptyFor loc
       [_] -> TypeErr $ ErrOneFor loc
-      TreeVar a _ : b : trees ->
+      a : b : trees ->
         let go a = \case
               [] -> parseExp a
-              b : trees -> case a of
-                TreeVar a loc -> ExpType (TypeFor a (go b trees) loc) loc
-                _ -> ExpErr $ ErrForNoName loc
-         in TypeFor a (go b trees) loc
-      _ -> TypeErr $ ErrForNoName loc
+              b : trees -> ExpType (TypeFor (parseVar a) (go b trees) loc) loc
+         in TypeFor (parseVar a) (go b trees) loc
   TreeVar ('T' :| "ype") loc ->
     Just $ TypeKind (ExpData (DataInt ('0' :| "") loc) loc) loc
   TreeParens (TreeVar ('T' :| "ype") _ : trees) loc ->
@@ -267,5 +269,7 @@ parseData parse ctor = \case
   TreeVar var loc -> Just $ DataVar var loc
   _ -> Nothing
 
-parseVar :: Tree -> Name
-parseVar = undefined
+parseVar :: Tree -> Var
+parseVar = \case
+  TreeVar var loc -> Var var loc
+  tree -> VarErr $ ErrNoVar (locate tree)
