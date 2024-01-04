@@ -1,4 +1,4 @@
-module Tree (Tree (..), parseTrees) where
+module Tree (Tree (..), Locate (..), parseTrees) where
 
 import Token
 import Parss.Parser
@@ -22,6 +22,20 @@ data Tree
   | TreeInt Name Loc
   | TreeVar Name Loc
   deriving (Show)
+
+class Locate a where
+  locate :: a -> Loc
+
+instance Locate Tree where
+  locate = \case
+    TreeParens _ loc -> loc
+    TreeBrackets _ loc -> loc
+    TreeBraces _ loc -> loc
+    TreeStr _ loc -> loc
+    TreeChar _ loc -> loc
+    TreeFloat _ loc -> loc
+    TreeInt _ loc -> loc
+    TreeVar _ loc -> loc
 
 parseTrees :: [Token] -> [Tree]
 parseTrees = parse (many parseTree) . ([],)
