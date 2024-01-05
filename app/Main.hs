@@ -7,7 +7,7 @@ import Tree
 data Pipeline = Pipeline
   { tokens :: [Token],
     trees :: [Tree],
-    ast :: Ast
+    ast :: ExpAst
   }
   deriving (Show)
 
