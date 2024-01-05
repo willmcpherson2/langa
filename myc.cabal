@@ -35,6 +35,7 @@ executable myc
     Tree
     , Ast
     , Parse
+    , Locate
   build-depends:
     base
     , parss

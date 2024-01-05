@@ -1,4 +1,4 @@
-module Tree (Tree (..), Name, Match, Source, Loc, Locate (..), parseTrees) where
+module Tree (Tree (..), parseTrees) where
 
 import Data.Char (isDigit, isSpace)
 import Data.List.NonEmpty (NonEmpty (..), nonEmpty, toList)
@@ -6,39 +6,22 @@ import Parss.Combinators
 import Parss.Parser
 import Parss.Stream
 import Parss.Trans
+import Ast
 
 data Tree
   = TreeParens [Tree] Loc
   | TreeBrackets [Tree] Loc
   | TreeBraces [Tree] Loc
-  | TreeStr String Loc
-  | TreeChar Char Loc
-  | TreeFloat Name Loc
-  | TreeInt Name Loc
-  | TreeVar Name Loc
+  | TreeStr StrLit
+  | TreeChar CharLit
+  | TreeFloat FloatLit
+  | TreeInt IntLit
+  | TreeVar Var
   deriving (Show)
-
-type Name = NonEmpty Char
 
 type Match = String
 
 type Source = (String, String)
-
-type Loc = (String, String, String)
-
-class Locate a where
-  locate :: a -> Loc
-
-instance Locate Tree where
-  locate = \case
-    TreeParens _ loc -> loc
-    TreeBrackets _ loc -> loc
-    TreeBraces _ loc -> loc
-    TreeStr _ loc -> loc
-    TreeChar _ loc -> loc
-    TreeFloat _ loc -> loc
-    TreeInt _ loc -> loc
-    TreeVar _ loc -> loc
 
 parseTrees :: String -> [Tree]
 parseTrees = parse (many parseTree) . ("",)
@@ -83,13 +66,13 @@ parseStr = locateM . fallible $ do
   let close = '`' : concat eof
   str <- ok $ many $ try $ neg $ try (string close) <|> end
   need $ try $ string close
-  pure $ TreeStr $ concat str
+  pure $ TreeStr . StrLit (concat str)
 
 parseChar :: Parser Match Source (Maybe Tree)
 parseChar = locateM . fallible $ do
   need $ try $ is '\''
   char <- need stream
-  pure $ TreeChar char
+  pure $ TreeChar . CharLit char
 
 parseFloat :: Parser Match Source (Maybe Tree)
 parseFloat = locateM . fallible $ do
@@ -98,25 +81,25 @@ parseFloat = locateM . fallible $ do
   point <- need $ try $ string $ '.' :| ""
   frac <- need parseNat
   let num = nat <> point <> frac
-  pure $ TreeFloat $ maybe num (<> num) sign
+  pure $ TreeFloat . FloatLit (maybe num (<> num) sign)
 
 parseInt :: Parser Match Source (Maybe Tree)
 parseInt = locateM . fallible $ do
   sign <- ok parseSign
   nat <- need parseNat
-  pure $ TreeInt $ maybe nat (<> nat) sign
+  pure $ TreeInt . IntLit (maybe nat (<> nat) sign)
 
-parseSign :: Parser Match Source (Maybe Name)
+parseSign :: Parser Match Source (Maybe Chars)
 parseSign = try (string $ '+' :| "") <|> try (string $ '-' :| "")
 
-parseNat :: Parser Match Source (Maybe Name)
+parseNat :: Parser Match Source (Maybe Chars)
 parseNat = some $ try $ satisfy isDigit
 
 parseVar :: Parser Match Source (Maybe Tree)
 parseVar = locateM . fallible $ do
   notSep <- need $ some $ try $ neg $ parseSeparator <|> end
   var <- need $ pure $ nonEmpty $ concat notSep
-  pure $ TreeVar var
+  pure $ TreeVar . Var var
 
 parseSpace :: Parser Match Source (Maybe Match)
 parseSpace = fallible $ do

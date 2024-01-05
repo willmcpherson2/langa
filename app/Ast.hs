@@ -31,19 +31,19 @@ module Ast
     Pat (..),
     Data (..),
     Cons (..),
-    Str (..),
-    Chr (..),
-    Flt (..),
-    Intg (..),
+    StrLit (..),
+    CharLit (..),
+    FloatLit (..),
+    IntLit (..),
     Var (..),
+    Chars,
+    Loc,
     Fix (..),
     Fix2 (..),
-    Loc,
   )
 where
 
 import Data.List.NonEmpty (NonEmpty (..))
-import Tree
 
 type Ast a b = [Item a b] -- item*
 
@@ -216,10 +216,10 @@ data Pat
 
 data Data a
   = DataCons (Cons a)
-  | DataStr Str
-  | DataChar Chr
-  | DataFloat Flt
-  | DataInt Intg
+  | DataStr StrLit
+  | DataChar CharLit
+  | DataFloat FloatLit
+  | DataInt IntLit
   | DataVar Var
   deriving (Show)
 
@@ -229,24 +229,28 @@ data Cons a
   | ConsOne Loc
   deriving (Show)
 
-data Str = Str String Loc -- "foo"
+data StrLit = StrLit String Loc -- "foo"
   deriving (Show)
 
-data Chr = Chr Char Loc -- 'a
+data CharLit = CharLit Char Loc -- 'a
   deriving (Show)
 
-data Flt = Flt Name Loc -- 3.14
+data FloatLit = FloatLit Chars Loc -- 3.14
   deriving (Show)
 
-data Intg = Intg Name Loc -- 42
+data IntLit = IntLit Chars Loc -- 42
+  deriving (Show)
+
+data Var
+  = Var Chars Loc -- x
+  | VarNone Loc
   deriving (Show)
 
 --------------------------------------------------------------------------------
 
-data Var
-  = Var Name Loc -- x
-  | VarNone Loc
-  deriving (Show)
+type Chars = NonEmpty Char
+
+type Loc = (String, String, String)
 
 --------------------------------------------------------------------------------
 

@@ -2,20 +2,21 @@
 
 module Parse (parseAst) where
 
-import Data.List.NonEmpty (NonEmpty (..))
-import Tree
 import Ast
+import Data.List.NonEmpty (NonEmpty (..))
+import Locate (Locate (..))
+import Tree
 
 parseAst :: [Tree] -> ExpAst
 parseAst = map parseItem
 
 parseItem :: Tree -> Item (Fix2 Exp) (Fix2 Exp)
 parseItem = \case
-  TreeParens (TreeVar ('<' :| "-") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('<' :| "-") _) : trees) loc ->
     ItemImport $ case trees of
       [] -> ImportZero loc
       name : names -> Import (parseVar name) (map parseVar names) loc
-  TreeParens (TreeVar ('-' :| ">") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('-' :| ">") _) : trees) loc ->
     ItemExport $ case trees of
       [] -> ExportZero loc
       _ -> Export (map parseVar trees) loc
@@ -25,7 +26,7 @@ parseItem = \case
       [_] -> DeclareOne loc
       [name, exp] -> Declare (parseVar name) (Fix2 $ parseExp exp) loc
       _ -> DeclareMore loc
-  TreeParens (TreeVar ('=' :| "") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('=' :| "") _) : trees) loc ->
     ItemDef $ case trees of
       [] -> DefZero loc
       [_] -> DefOne loc
@@ -56,7 +57,7 @@ parseTyped = \case
 
 parseTerm :: Tree -> Maybe (Term (Fix2 Exp))
 parseTerm tree = case tree of
-  TreeParens (TreeVar ('-' :| ">") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('-' :| ">") _) : trees) loc ->
     Just . TermFun $ case trees of
       [] -> FunZero loc
       [_] -> FunOne loc
@@ -65,7 +66,7 @@ parseTerm tree = case tree of
               [] -> Fix2 $ parseExp a
               b : trees -> Fix2 . ExpTerm . TermFun $ Fun (parsePat a) (go b trees) loc
          in Fun (parsePat a) (go b trees) loc
-  TreeParens (TreeVar ('?' :| "") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('?' :| "") _) : trees) loc ->
     Just . TermCase $ case map parseExp trees of
       [] -> CaseZero loc
       [_] -> CaseOne loc
@@ -74,7 +75,7 @@ parseTerm tree = case tree of
               [] -> Fix2 a
               b : trees -> Fix2 . ExpTerm . TermCase $ Case (Fix2 a) (go b trees) loc
          in Case (Fix2 a) (go b trees) loc
-  TreeParens (TreeVar ('d' :| "o") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('d' :| "o") _) : trees) loc ->
     Just . TermDo $ case trees of
       [] -> DoZero loc
       [_] -> DoOne loc
@@ -85,7 +86,7 @@ parseTerm tree = case tree of
               [_] -> Fix2 . ExpTerm . TermDo $ DoOne loc
               b : c : trees -> Fix2 . ExpTerm . TermDo $ Do (parsePat b) (Fix2 $ parseExp c) (go a trees) loc
          in Do (parsePat a) (Fix2 $ parseExp b) (go c trees) loc
-  TreeParens (TreeVar ('=' :| "") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('=' :| "") _) : trees) loc ->
     Just . TermLet $ case trees of
       [] -> LetZero loc
       [_] -> LetOne loc
@@ -109,11 +110,11 @@ parseTerm tree = case tree of
 
 parseType :: Tree -> Maybe (Type (Fix2 Exp))
 parseType = \case
-  TreeVar ('S' :| "tring") loc -> Just . TypeStr $ StrType loc
-  TreeVar ('C' :| "har") loc -> Just . TypeChar $ CharType loc
-  TreeVar ('F' :| "loat") loc -> Just . TypeFloat $ FloatType loc
-  TreeVar ('I' :| "nt") loc -> Just . TypeInt $ IntType loc
-  TreeParens (TreeVar ('=' :| ">") _ : trees) loc ->
+  TreeVar (Var ('S' :| "tring") loc) -> Just . TypeStr $ StrType loc
+  TreeVar (Var ('C' :| "har") loc) -> Just . TypeChar $ CharType loc
+  TreeVar (Var ('F' :| "loat") loc) -> Just . TypeFloat $ FloatType loc
+  TreeVar (Var ('I' :| "nt") loc) -> Just . TypeInt $ IntType loc
+  TreeParens (TreeVar (Var ('=' :| ">") _) : trees) loc ->
     Just . TypeFun $ case map parseExp trees of
       [] -> FunTypeZero loc
       [_] -> FunTypeOne loc
@@ -122,14 +123,14 @@ parseType = \case
               [] -> Fix2 a
               b : trees -> Fix2 . ExpType . TypeFun $ FunType (Fix2 a) (go b trees) loc
          in FunType (Fix2 a) (go b trees) loc
-  TreeVar ('D' :| "o") loc ->
-    Just . TypeDo $ DoType (Fix2 . ExpTerm $ TermData (DataInt $ Intg ('0' :| "") loc)) loc
-  TreeParens (TreeVar ('D' :| "o") _ : trees) loc ->
+  TreeVar (Var ('D' :| "o") loc) ->
+    Just . TypeDo $ DoType (Fix2 . ExpTerm $ TermData (DataInt $ IntLit ('0' :| "") loc)) loc
+  TreeParens (TreeVar (Var ('D' :| "o") _) : trees) loc ->
     Just . TypeDo $ case trees of
       [] -> DoTypeZero loc
       [exp] -> DoType (Fix2 $ parseExp exp) loc
       _ -> DoTypeMany loc
-  TreeParens (TreeVar ('S' :| "et") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('S' :| "et") _) : trees) loc ->
     Just . TypeSet $ case map parseExp trees of
       [] -> SetZero loc
       [_] -> SetOne loc
@@ -138,7 +139,7 @@ parseType = \case
               [] -> Fix2 a
               b : trees -> Fix2 . ExpType . TypeSet $ Set (Fix2 a) (go b trees) loc
          in Set (Fix2 a) (go b trees) loc
-  TreeParens (TreeVar ('F' :| "or") _ : trees) loc ->
+  TreeParens (TreeVar (Var ('F' :| "or") _) : trees) loc ->
     Just . TypeFor $ case trees of
       [] -> ForZero loc
       [_] -> ForOne loc
@@ -147,9 +148,9 @@ parseType = \case
               [] -> Fix2 $ parseExp a
               b : trees -> Fix2 . ExpType . TypeFor $ For (parseVar a) (go b trees) loc
          in For (parseVar a) (go b trees) loc
-  TreeVar ('T' :| "ype") loc ->
-    Just . TypeKind $ Kind (Fix2 . ExpTerm $ TermData (DataInt $ Intg ('0' :| "") loc)) loc
-  TreeParens (TreeVar ('T' :| "ype") _ : trees) loc ->
+  TreeVar (Var ('T' :| "ype") loc) ->
+    Just . TypeKind $ Kind (Fix2 . ExpTerm $ TermData (DataInt $ IntLit ('0' :| "") loc)) loc
+  TreeParens (TreeVar (Var ('T' :| "ype") _) : trees) loc ->
     Just . TypeKind $ case trees of
       [] -> KindZero loc
       [exp] -> Kind (Fix2 $ parseExp exp) loc
@@ -172,14 +173,14 @@ parseData parse fix ctor = \case
               [] -> fix a
               b : trees -> fix . ctor . DataCons $ Cons (fix a) (go b trees) loc
          in Cons (fix a) (go b trees) loc
-  TreeStr var loc -> Just . DataStr $ Str var loc
-  TreeChar var loc -> Just . DataChar $ Chr var loc
-  TreeFloat var loc -> Just . DataFloat $ Flt var loc
-  TreeInt var loc -> Just . DataInt $ Intg var loc
-  TreeVar var loc -> Just . DataVar $ Var var loc
+  TreeStr str -> Just $ DataStr str
+  TreeChar char -> Just $ DataChar char
+  TreeFloat float -> Just $ DataFloat float
+  TreeInt int -> Just $ DataInt int
+  TreeVar var -> Just $ DataVar var
   _ -> Nothing
 
 parseVar :: Tree -> Var
 parseVar = \case
-  TreeVar var loc -> Var var loc
+  TreeVar var -> var
   tree -> VarNone (locate tree)
