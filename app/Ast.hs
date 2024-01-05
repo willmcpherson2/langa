@@ -1,3 +1,4 @@
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Ast
@@ -258,15 +259,13 @@ newtype Fix f = Fix {unfix :: OfFix f}
 
 type OfFix f = f (Fix f)
 
-instance (Show (OfFix f)) => Show (Fix f) where
-  show x = "(Fix (" <> show (unfix x) <> "))"
+deriving instance (Show (OfFix f)) => Show (Fix f)
 
 newtype Fix2 f = Fix2 {unfix2 :: OfFix2 f}
 
 type OfFix2 f = f (Fix2 f) (Fix2 f)
 
-instance (Show (OfFix2 f)) => Show (Fix2 f) where
-  show x = "(Fix2 (" <> show (unfix2 x) <> "))"
+deriving instance (Show (OfFix2 f)) => Show (Fix2 f)
 
 --------------------------------------------------------------------------------
 
