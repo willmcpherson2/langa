@@ -1,6 +1,7 @@
 module Main (main) where
 
 import Ast
+import Parse
 import Token
 import Tree
 

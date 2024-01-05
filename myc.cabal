@@ -35,6 +35,7 @@ executable myc
     Token
     , Tree
     , Ast
+    , Parse
   build-depends:
     base
     , parss
