@@ -32,8 +32,7 @@ executable myc
   hs-source-dirs: app
   main-is: Main.hs
   other-modules:
-    Token
-    , Tree
+    Tree
     , Ast
     , Parse
   build-depends:

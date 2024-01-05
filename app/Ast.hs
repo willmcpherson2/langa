@@ -43,7 +43,7 @@ module Ast
 where
 
 import Data.List.NonEmpty (NonEmpty (..))
-import Token
+import Tree
 
 type Ast a b = [Item a b] -- item*
 
@@ -263,10 +263,6 @@ type OfFix2 f = f (Fix2 f) (Fix2 f)
 
 instance (Show (OfFix2 f)) => Show (Fix2 f) where
   show x = "(Fix2 (" <> show (unfix2 x) <> "))"
-
---------------------------------------------------------------------------------
-
-type Loc = ([Token], [Token], [Token])
 
 --------------------------------------------------------------------------------
 

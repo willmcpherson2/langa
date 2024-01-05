@@ -2,22 +2,19 @@ module Main (main) where
 
 import Ast
 import Parse
-import Token
 import Tree
 
 data Pipeline = Pipeline
-  { tokens :: [Token],
-    trees :: [Tree],
+  { trees :: [Tree],
     ast :: ExpAst
   }
   deriving (Show)
 
 run :: String -> Pipeline
 run s =
-  let tokens = parseTokens s
-      trees = parseTrees tokens
+  let trees = parseTrees s
       ast = parseAst trees
-   in Pipeline {tokens, trees, ast}
+   in Pipeline {trees, ast}
 
 main :: IO ()
 main = pure ()
