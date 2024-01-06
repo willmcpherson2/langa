@@ -3,13 +3,42 @@
 module Display (Display (..)) where
 
 import Ast
-import Data.List.NonEmpty
+import Data.List.NonEmpty (toList)
 
 class Display a where
   display :: a -> String
 
 report :: Loc -> String -> String
-report (l, m, r) msg = msg
+report (l, m, r) msg =
+  let (charsBefore, linesBefore) = break (== '\n') l
+      lineStart = length $ filter (== '\n') linesBefore
+      charStart = length charsBefore
+      charEnd =
+        if length (lines m) > 1
+          then length $ last $ lines m
+          else charStart + length m
+      lineEnd = lineStart + length (lines m)
+   in "\n"
+        <> show (lineStart + 1)
+        <> ":"
+        <> show (charStart + 1)
+        <> "-"
+        <> show lineEnd
+        <> ":"
+        <> show charEnd
+        <> "\n"
+        <> replicate charStart ' '
+        <> "↓"
+        <> "\n"
+        <> reverse charsBefore
+        <> m
+        <> takeWhile (/= '\n') r
+        <> "\n"
+        <> replicate (charEnd - 1) ' '
+        <> "↑"
+        <> "\n"
+        <> msg
+        <> "\n"
 
 instance (Display a, Display b) => Display (Ast a b) where
   display items = unlines $ display <$> items
