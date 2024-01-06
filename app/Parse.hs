@@ -84,7 +84,7 @@ parseTerm tree = case tree of
         let go a = \case
               [] -> Fix2 $ parseExp a
               [_] -> Fix2 . ExpTerm . TermDo $ DoOne loc
-              b : c : trees -> Fix2 . ExpTerm . TermDo $ Do (parsePat b) (Fix2 $ parseExp c) (go a trees) loc
+              b : c : trees -> Fix2 . ExpTerm . TermDo $ Do (parsePat a) (Fix2 $ parseExp b) (go c trees) loc
          in Do (parsePat a) (Fix2 $ parseExp b) (go c trees) loc
   TreeParens (TreeVar (Var ('=' :| "") _) : trees) loc ->
     Just . TermLet $ case trees of
@@ -95,7 +95,7 @@ parseTerm tree = case tree of
         let go a = \case
               [] -> Fix2 $ parseExp a
               [_] -> Fix2 . ExpTerm . TermLet $ LetOne loc
-              b : c : trees -> Fix2 . ExpTerm . TermLet $ Let (parsePat b) (Fix2 $ parseExp c) (go a trees) loc
+              b : c : trees -> Fix2 . ExpTerm . TermLet $ Let (parsePat a) (Fix2 $ parseExp b) (go c trees) loc
          in Let (parsePat a) (Fix2 $ parseExp b) (go c trees) loc
   TreeParens trees loc ->
     Just . TermApp $ case map parseExp trees of

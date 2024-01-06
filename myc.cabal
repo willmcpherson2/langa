@@ -36,6 +36,7 @@ executable myc
     , Ast
     , Parse
     , Locate
+    , Display
   build-depends:
     base
     , parss

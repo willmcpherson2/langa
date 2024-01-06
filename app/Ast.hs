@@ -40,7 +40,9 @@ module Ast
     Chars,
     Loc,
     Fix (..),
+    OfFix,
     Fix2 (..),
+    OfFix2,
   )
 where
 
@@ -230,7 +232,7 @@ data Cons a
   | ConsOne Loc
   deriving (Show)
 
-data StrLit = StrLit String Loc -- "foo"
+data StrLit = StrLit String String Loc -- "foo"
   deriving (Show)
 
 data CharLit = CharLit Char Loc -- 'a

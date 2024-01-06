@@ -3,6 +3,8 @@ module Main (main, run) where
 import Ast
 import Parse
 import Tree
+import Display
+import Locate
 
 data Pipeline = Pipeline
   { trees :: [Tree],

@@ -66,7 +66,7 @@ parseStr = locateM . fallible $ do
   let close = '`' : concat eof
   str <- ok $ many $ try $ neg $ try (string close) <|> end
   need $ try $ string close
-  pure $ TreeStr . StrLit (concat str)
+  pure $ TreeStr . StrLit (concat eof) (concat str)
 
 parseChar :: Parser Match Source (Maybe Tree)
 parseChar = locateM . fallible $ do
