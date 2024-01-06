@@ -41,7 +41,7 @@ instance (Display a) => Display (Declare a) where
 
 instance (Display a, Display b) => Display (Def a b) where
   display = \case
-    Def var exp _ -> "(= " <> display var <> " " <> display exp <> "}"
+    Def var exp _ -> "(= " <> display var <> " " <> display exp <> ")"
     DefZero loc -> report loc "Expected variable and expression"
     DefOne loc -> report loc "Expected variable and expression"
     DefMore loc -> report loc "Expected variable and expression"
