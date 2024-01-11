@@ -48,21 +48,21 @@ where
 
 import Data.List.NonEmpty (NonEmpty (..))
 
-type Ast a b = [Item a b] -- item*
+type Ast a = [Item a] -- item*
 
-type ExpAst = Ast (Fix2 Exp) (Fix2 Exp) -- {exp exp}
+type ExpAst = Ast (Fix2 Exp) -- {exp exp}
 
-type TypedAst = Ast (Fix Type) (Fix2 Exp) -- {type exp}
+type TypedAst = Ast (Exp (Fix Type) (Fix2 Exp)) -- {type exp}
 
-type TermAst = Ast () (Fix Term) -- term
+type TermAst = Ast (Fix Term) -- term
 
 --------------------------------------------------------------------------------
 
-data Item a b
+data Item a
   = ItemImport Import
   | ItemExport Export
   | ItemDeclare (Declare a)
-  | ItemDef (Def a b)
+  | ItemDef (Def a)
   | ItemNone Loc
   deriving (Show)
 
@@ -83,8 +83,8 @@ data Declare a
   | DeclareMore Loc
   deriving (Show)
 
-data Def a b
-  = Def Var (Exp a b) Loc -- (= name exp)
+data Def a
+  = Def Var a Loc -- (= name exp)
   | DefZero Loc
   | DefOne Loc
   | DefMore Loc
@@ -280,7 +280,7 @@ expAst =
   [ ItemDef $
       Def
         (Var ('i' :| "d") noLoc)
-        ( ExpTyped $
+        ( Fix2 . ExpTyped $
             Typed
               ( Fix2 . ExpType . TypeFor $
                   For
@@ -346,18 +346,13 @@ termAst =
   [ ItemDef $
       Def
         (Var ('i' :| "d") noLoc)
-        ( ExpTyped $
-            Typed
-              ()
-              ( Fix . TermFun $
-                  Fun
-                    ( Pat
-                        (DataVar $ Var ('x' :| "") noLoc)
-                        noLoc
-                    )
-                    (Fix . TermData . DataVar $ Var ('x' :| "") noLoc)
-                    noLoc
+        ( Fix . TermFun $
+            Fun
+              ( Pat
+                  (DataVar $ Var ('x' :| "") noLoc)
+                  noLoc
               )
+              (Fix . TermData . DataVar $ Var ('x' :| "") noLoc)
               noLoc
         )
         noLoc

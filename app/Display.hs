@@ -40,10 +40,10 @@ report (l, m, r) msg =
         <> msg
         <> "\n"
 
-instance (Display a, Display b) => Display (Ast a b) where
+instance (Display a) => Display (Ast a) where
   display items = unlines $ display <$> items
 
-instance (Display a, Display b) => Display (Item a b) where
+instance (Display a) => Display (Item a) where
   display = \case
     ItemImport imprt -> display imprt
     ItemExport export -> display export
@@ -68,7 +68,7 @@ instance (Display a) => Display (Declare a) where
     DeclareOne loc -> report loc "Expected variable and expression"
     DeclareMore loc -> report loc "Expected variable and expression"
 
-instance (Display a, Display b) => Display (Def a b) where
+instance (Display a) => Display (Def a) where
   display = \case
     Def var exp _ -> "(= " <> display var <> " " <> display exp <> ")"
     DefZero loc -> report loc "Expected variable and expression"
