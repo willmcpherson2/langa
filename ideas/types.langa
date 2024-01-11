@@ -1,0 +1,61 @@
+-- self type
+(: x x)
+
+-- types of terms
+(: (Type 0) (=> 1 0)            (-> 1 0))
+(: (Type 0) (=> {1 0} {0 1})    (? (-> 1 0) (-> 0 1)))
+(: (Type 0) {(=> 1 0) (=> 0 1)} (? (-> 1 0) (-> 0 1)))
+(: (Type 0) {1 0}               1)
+(: (Type 0) (Do String)         (do _ (put-line "enter your input") get-line))
+(: (Type 0) 1                   (= x 1 x))
+(: (Type 0) 0                   ((-> 1 0) 1))
+(: (Type 0) [Int Float]         [42 3.14])
+(: (Type 0) [Char Char Char]    "hey")
+(: (Type 0) Char                'a)
+(: (Type 0) Float               3.14)
+(: (Type 0) Int                 -7)
+(: (Type 0) Nat                 42)
+(: (Type 0) 1                   one)
+
+-- cumulative type universes
+(: (Type (+ n 1)) (Type n))
+
+-- polymorphism
+(A a (: (=> a a) (-> x x)))
+
+---
+
+(-> x x) -- term
+
+(A a
+   (: (=> a a)   -- type
+      (-> x x))) -- term
+
+(A n
+   (: (Type n) a) -- kind
+   (: (=> a a)    -- type
+      (-> x x)))  -- term
+
+(A (: Nat n)      -- level
+   (: (Type n) a) -- kind
+   (: (=> a a)    -- type
+      (-> x x)))  -- term
+
+---
+
+-- parse
+-- an expression is either a type expression and a term of expressions or a forall of expressions
+exp = (: exp (term exp)) | (A var exp)
+
+(: Int 1)
+(: (id Int) 1)
+(: (=> Int Int) (-> (: Int 1) (: Int 0)))
+(A a (: (=> a a) (-> (: a x) (: a x))))
+
+-- type eval
+-- an expression is a type and a term of expressions
+exp = (: type (term exp))
+
+(: Int 1)
+(: (=> Int Int) (-> (: Int 1) (: Int 0)))
+(: (=> Int Int) (-> (: Int x) (: Int x)))
