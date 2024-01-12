@@ -45,7 +45,7 @@ parseExp tree = Fix2 $ case parseTyped tree of
 
 parseTyped :: Tree -> Maybe (Typed (Fix2 Exp) (Fix2 Exp))
 parseTyped = \case
-  TreeBraces trees loc ->
+  TreeParens (TreeVar (Var (':' :| "") _) : trees) loc ->
     Just $ case trees of
       [] -> TypedZero loc
       [_] -> TypedOne loc
@@ -128,7 +128,7 @@ parseType = \case
       [] -> DoTypeZero loc
       [exp] -> DoType (parseExp exp) loc
       _ -> DoTypeMany loc
-  TreeParens (TreeVar (Var ('S' :| "et") _) : trees) loc ->
+  TreeBraces trees loc ->
     Just . TypeSet $ case map (unfix2 . parseExp) trees of
       [] -> SetZero loc
       [_] -> SetOne loc

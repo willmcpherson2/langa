@@ -103,7 +103,7 @@ data Exp a b
 --------------------------------------------------------------------------------
 
 data Typed a b
-  = Typed a b Loc -- {type exp}
+  = Typed a b Loc -- (: type exp)
   | TypedZero Loc
   | TypedOne Loc
   | TypedMore Loc
@@ -149,7 +149,7 @@ data DoType a
   deriving (Show)
 
 data Set a
-  = Set a a Loc -- (Set type type+)
+  = Set a a Loc -- {type type+}
   | SetZero Loc
   | SetOne Loc
   deriving (Show)

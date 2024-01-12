@@ -84,7 +84,7 @@ instance (Display a, Display b) => Display (Exp a b) where
 
 instance (Display a, Display b) => Display (Typed a b) where
   display = \case
-    Typed exp ty _ -> "{" <> display exp <> " " <> display ty <> "}"
+    Typed exp ty _ -> "(: " <> display exp <> " " <> display ty <> ")"
     TypedZero loc -> report loc "Expected two expressions"
     TypedOne loc -> report loc "Expected two expressions"
     TypedMore loc -> report loc "Expected two expressions"
@@ -128,7 +128,7 @@ instance (Display a) => Display (DoType a) where
 
 instance (Display a) => Display (Set a) where
   display = \case
-    Set a b _ -> "(Set " <> display a <> " " <> display b <> ")"
+    Set a b _ -> "{" <> display a <> " " <> display b <> "}"
     SetZero loc -> report loc "Expected two expressions"
     SetOne loc -> report loc "Expected two expressions"
 
