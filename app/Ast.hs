@@ -234,7 +234,7 @@ data Cons a
   | ConsOne Loc
   deriving (Show)
 
-data CharLit = CharLit Char Loc -- 'a
+data CharLit = CharLit Char Loc -- 'a'
   deriving (Show)
 
 data FloatLit = FloatLit Float Loc -- 3.14

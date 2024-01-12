@@ -11,7 +11,7 @@
 (: (Type 0) 0                   ((-> 1 0) 1))
 (: (Type 0) [Int Float]         [42 3.14])
 (: (Type 0) [Char Char Char]    "hey")
-(: (Type 0) Char                'a)
+(: (Type 0) Char                'a')
 (: (Type 0) Float               3.14)
 (: (Type 0) Int                 -7)
 (: (Type 0) Nat                 42)

@@ -207,7 +207,7 @@ instance (Display a) => Display (Cons a) where
     ConsOne loc -> report loc "Expected two expressions"
 
 instance Display CharLit where
-  display (CharLit char _) = "'" <> [char]
+  display (CharLit char _) = "'" <> [char] <> "'"
 
 instance Display FloatLit where
   display (FloatLit float _) = show float
