@@ -137,7 +137,7 @@ parseType = \case
               [] -> Fix2 a
               b : trees -> Fix2 . ExpType . TypeSet $ Set (Fix2 a) (go b trees) loc
          in Set (Fix2 a) (go b trees) loc
-  TreeParens (TreeVar (Var ('F' :| "or") _) : trees) loc ->
+  TreeParens (TreeVar (Var ('A' :| "") _) : trees) loc ->
     Just . TypeFor $ case trees of
       [] -> ForZero loc
       [_] -> ForOne loc

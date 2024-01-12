@@ -155,7 +155,7 @@ data Set a
   deriving (Show)
 
 data For a
-  = For Var a Loc -- (For name+ type)
+  = For Var a Loc -- (A name+ type)
   | ForZero Loc
   | ForOne Loc
   deriving (Show)

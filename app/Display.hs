@@ -134,7 +134,7 @@ instance (Display a) => Display (Set a) where
 
 instance (Display a) => Display (For a) where
   display = \case
-    For var ty _ -> "(For " <> display var <> " " <> display ty <> ")"
+    For var ty _ -> "(A " <> display var <> " " <> display ty <> ")"
     ForZero loc -> report loc "Expected variable and expression"
     ForOne loc -> report loc "Expected variable and expression"
 
