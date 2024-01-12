@@ -14,6 +14,7 @@ instance Locate Tree where
     TreeChar (CharLit _ loc) -> loc
     TreeFloat (FloatLit _ loc) -> loc
     TreeInt (IntLit _ loc) -> loc
+    TreeNat (NatLit _ loc) -> loc
     TreeNil (NilLit loc) -> loc
     TreeVar (Var _ loc) -> loc
     TreeVar (VarNone loc) -> loc

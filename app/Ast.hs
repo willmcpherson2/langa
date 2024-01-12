@@ -237,13 +237,13 @@ data Cons a
 data CharLit = CharLit Char Loc -- 'a
   deriving (Show)
 
-data FloatLit = FloatLit Chars Loc -- 3.14
+data FloatLit = FloatLit Float Loc -- 3.14
   deriving (Show)
 
-data IntLit = IntLit Chars Loc -- -7
+data IntLit = IntLit Int Loc -- -7
   deriving (Show)
 
-data NatLit = NatLit Chars Loc -- 42
+data NatLit = NatLit Int Loc -- 42
   deriving (Show)
 
 newtype NilLit = NilLit Loc -- nil

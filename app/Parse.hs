@@ -149,7 +149,7 @@ parseType = \case
               b : trees -> Fix2 . ExpType . TypeFor $ For (parseVar a) (go b trees) loc
          in For (parseVar a) (go b trees) loc
   TreeVar (Var ('T' :| "ype") loc) ->
-    Just . TypeKind $ Kind (Fix2 . ExpTerm $ TermData (DataNat $ NatLit ('0' :| "") loc)) loc
+    Just . TypeKind $ Kind (Fix2 . ExpTerm $ TermData (DataNat $ NatLit 0 loc)) loc
   TreeParens (TreeVar (Var ('T' :| "ype") _) : trees) loc ->
     Just . TypeKind $ case trees of
       [] -> KindZero loc

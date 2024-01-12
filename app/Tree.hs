@@ -1,12 +1,14 @@
 module Tree (Tree (..), parseTrees) where
 
 import Ast
-import Data.Char (isDigit, isSpace)
-import Data.List.NonEmpty (NonEmpty (..), nonEmpty, toList)
+import Control.Monad (guard)
+import Data.Char (isSpace)
+import Data.List.NonEmpty (nonEmpty, toList)
 import Parss.Combinators
 import Parss.Parser
 import Parss.Stream
 import Parss.Trans
+import Text.Read (readMaybe)
 
 data Tree
   = TreeParens [Tree] Loc
@@ -35,9 +37,9 @@ parseTree = do
     <|> try parseBraces
     <|> try parseStr
     <|> try parseChar
-    <|> try parseFloat
     <|> try parseNat
     <|> try parseInt
+    <|> try parseFloat
     <|> try parseNil
     <|> try parseVar
 
@@ -83,25 +85,21 @@ parseChar = locateM . fallible $ do
 
 parseFloat :: Parser Match Source (Maybe Tree)
 parseFloat = locateM . fallible $ do
-  sign <- ok parseSign
-  TreeNat (NatLit nat _) <- need parseNat
-  point <- need $ try $ string $ '.' :| ""
-  TreeNat (NatLit frac _) <- need parseNat
-  let num = nat <> point <> frac
-  pure $ TreeFloat . FloatLit (maybe num (<> num) sign)
+  TreeVar (Var s _) <- need parseVar
+  float <- need $ pure $ readMaybe $ toList s
+  pure $ TreeFloat . FloatLit float
 
 parseInt :: Parser Match Source (Maybe Tree)
 parseInt = locateM . fallible $ do
-  sign <- ok parseSign
-  TreeNat (NatLit nat _) <- need parseNat
-  pure $ TreeInt . IntLit (maybe nat (<> nat) sign)
-
-parseSign :: Parser Match Source (Maybe Chars)
-parseSign = try (string $ '+' :| "") <|> try (string $ '-' :| "")
+  TreeVar (Var s _) <- need parseVar
+  nat <- need $ pure $ readMaybe $ toList s
+  pure $ TreeInt . IntLit nat
 
 parseNat :: Parser Match Source (Maybe Tree)
 parseNat = locateM . fallible $ do
-  nat <- need $ some $ try $ satisfy isDigit
+  TreeVar (Var s _) <- need parseVar
+  nat <- need $ pure $ readMaybe $ toList s
+  need $ pure $ guard (nat >= 0)
   pure $ TreeNat . NatLit nat
 
 parseNil :: Parser Match Source (Maybe Tree)

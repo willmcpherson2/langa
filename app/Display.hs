@@ -95,6 +95,7 @@ instance (Display a) => Display (Type a) where
     TypeChar char -> display char
     TypeFloat float -> display float
     TypeInt int -> display int
+    TypeNat nat -> display nat
     TypeFun fun -> display fun
     TypeDo d -> display d
     TypeSet set -> display set
@@ -109,6 +110,9 @@ instance Display FloatType where
 
 instance Display IntType where
   display _ = "Int"
+
+instance Display NatType where
+  display _ = "Nat"
 
 instance (Display a) => Display (FunType a) where
   display = \case
@@ -192,6 +196,7 @@ instance (Display a) => Display (Data a) where
     DataChar char -> display char
     DataFloat float -> display float
     DataInt int -> display int
+    DataNat nat -> display nat
     DataNil nil -> display nil
     DataVar var -> display var
 
@@ -205,10 +210,13 @@ instance Display CharLit where
   display (CharLit char _) = "'" <> [char]
 
 instance Display FloatLit where
-  display (FloatLit chars _) = display chars
+  display (FloatLit float _) = show float
 
 instance Display IntLit where
-  display (IntLit chars _) = display chars
+  display (IntLit int _) = show int
+
+instance Display NatLit where
+  display (NatLit nat _) = show nat
 
 instance Display NilLit where
   display (NilLit _) = "nil"
