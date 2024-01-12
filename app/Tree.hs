@@ -66,9 +66,9 @@ parseBraces = locateM . fallible $ do
 
 parseStr :: Parser Match Source (Maybe Tree)
 parseStr = locateM . fallible $ do
-  eof <- ok $ many $ try $ neg $ liftResult (try $ is '`') <|> end
-  need $ try $ is '`'
-  let close = '`' : concat eof
+  eof <- ok $ many $ try $ neg $ liftResult (try $ is '"') <|> end
+  need $ try $ is '"'
+  let close = '"' : concat eof
   str <- ok $ many $ try $ locateM $ fallible $ do
     [char] <- need $ neg $ try (string close) <|> end
     pure $ TreeChar . CharLit char
