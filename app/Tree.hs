@@ -83,11 +83,12 @@ parseChar = locateM . fallible $ do
   char <- need $ pure $ readMaybe $ toList s
   pure $ TreeChar . CharLit char
 
-parseFloat :: Parser Match Source (Maybe Tree)
-parseFloat = locateM . fallible $ do
+parseNat :: Parser Match Source (Maybe Tree)
+parseNat = locateM . fallible $ do
   TreeVar (Var s _) <- need parseVar
-  float <- need $ pure $ readMaybe $ toList s
-  pure $ TreeFloat . FloatLit float
+  nat <- need $ pure $ readMaybe $ toList s
+  need $ pure $ guard (nat >= 0)
+  pure $ TreeNat . NatLit nat
 
 parseInt :: Parser Match Source (Maybe Tree)
 parseInt = locateM . fallible $ do
@@ -95,12 +96,11 @@ parseInt = locateM . fallible $ do
   nat <- need $ pure $ readMaybe $ toList s
   pure $ TreeInt . IntLit nat
 
-parseNat :: Parser Match Source (Maybe Tree)
-parseNat = locateM . fallible $ do
+parseFloat :: Parser Match Source (Maybe Tree)
+parseFloat = locateM . fallible $ do
   TreeVar (Var s _) <- need parseVar
-  nat <- need $ pure $ readMaybe $ toList s
-  need $ pure $ guard (nat >= 0)
-  pure $ TreeNat . NatLit nat
+  float <- need $ pure $ readMaybe $ toList s
+  pure $ TreeFloat . FloatLit float
 
 parseNil :: Parser Match Source (Maybe Tree)
 parseNil = locateM . fallible $ do
