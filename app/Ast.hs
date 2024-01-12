@@ -279,7 +279,7 @@ deriving instance (Show (OfFix2 f)) => Show (Fix2 f)
 noLoc :: Loc
 noLoc = ([], [], [])
 
--- (= id {(For a (=> a a)) (-> x x)})
+-- (= id (: (A a (=> a a)) (-> x x)))
 expAst :: ExpAst
 expAst =
   [ ItemDef $
@@ -312,7 +312,7 @@ expAst =
         noLoc
   ]
 
--- (= id {(For a (=> a a)) (-> x x)})
+-- (= id (: (A a (=> a a)) (-> x x)))
 typedAst :: TypedAst
 typedAst =
   [ ItemDef $
