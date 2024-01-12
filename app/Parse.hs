@@ -110,7 +110,6 @@ parseTerm tree = case tree of
 
 parseType :: Tree -> Maybe (Type (Fix2 Exp))
 parseType = \case
-  TreeVar (Var ('S' :| "tring") loc) -> Just . TypeStr $ StrType loc
   TreeVar (Var ('C' :| "har") loc) -> Just . TypeChar $ CharType loc
   TreeVar (Var ('F' :| "loat") loc) -> Just . TypeFloat $ FloatType loc
   TreeVar (Var ('I' :| "nt") loc) -> Just . TypeInt $ IntType loc

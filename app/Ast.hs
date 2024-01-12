@@ -20,7 +20,6 @@ module Ast
     Let (..),
     App (..),
     Type (..),
-    StrType (..),
     CharType (..),
     FloatType (..),
     IntType (..),
@@ -112,7 +111,6 @@ data Typed a b
 
 data Type a
   = TypeData (Data a)
-  | TypeStr StrType
   | TypeChar CharType
   | TypeFloat FloatType
   | TypeInt IntType
@@ -121,9 +119,6 @@ data Type a
   | TypeSet (Set a)
   | TypeFor (For a)
   | TypeKind (Kind a)
-  deriving (Show)
-
-newtype StrType = StrType Loc -- String
   deriving (Show)
 
 newtype CharType = CharType Loc -- Char

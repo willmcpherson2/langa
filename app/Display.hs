@@ -92,7 +92,6 @@ instance (Display a, Display b) => Display (Typed a b) where
 instance (Display a) => Display (Type a) where
   display = \case
     TypeData dat -> display dat
-    TypeStr str -> display str
     TypeChar char -> display char
     TypeFloat float -> display float
     TypeInt int -> display int
@@ -101,9 +100,6 @@ instance (Display a) => Display (Type a) where
     TypeSet set -> display set
     TypeFor for -> display for
     TypeKind kind -> display kind
-
-instance Display StrType where
-  display _ = "String"
 
 instance Display CharType where
   display _ = "Char"
