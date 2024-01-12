@@ -189,10 +189,10 @@ instance Display Pat where
 instance (Display a) => Display (Data a) where
   display = \case
     DataCons cons -> display cons
-    DataStr str -> display str
     DataChar char -> display char
     DataFloat float -> display float
     DataInt int -> display int
+    DataNil nil -> display nil
     DataVar var -> display var
 
 instance (Display a) => Display (Cons a) where
@@ -200,9 +200,6 @@ instance (Display a) => Display (Cons a) where
     Cons a b _ -> "[" <> display a <> " " <> display b <> "]"
     ConsZero loc -> report loc "Expected two expressions"
     ConsOne loc -> report loc "Expected two expressions"
-
-instance Display StrLit where
-  display (StrLit eof s _) = eof <> "`" <> s <> "`" <> eof
 
 instance Display CharLit where
   display (CharLit char _) = "'" <> [char]
@@ -212,6 +209,9 @@ instance Display FloatLit where
 
 instance Display IntLit where
   display (IntLit chars _) = display chars
+
+instance Display NilLit where
+  display (NilLit _) = "nil"
 
 instance Display Var where
   display = \case

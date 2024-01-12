@@ -1,21 +1,21 @@
 module Tree (Tree (..), parseTrees) where
 
+import Ast
 import Data.Char (isDigit, isSpace)
 import Data.List.NonEmpty (NonEmpty (..), nonEmpty, toList)
 import Parss.Combinators
 import Parss.Parser
 import Parss.Stream
 import Parss.Trans
-import Ast
 
 data Tree
   = TreeParens [Tree] Loc
   | TreeBrackets [Tree] Loc
   | TreeBraces [Tree] Loc
-  | TreeStr StrLit
   | TreeChar CharLit
   | TreeFloat FloatLit
   | TreeInt IntLit
+  | TreeNil NilLit
   | TreeVar Var
   deriving (Show)
 
@@ -36,6 +36,7 @@ parseTree = do
     <|> try parseChar
     <|> try parseFloat
     <|> try parseInt
+    <|> try parseNil
     <|> try parseVar
 
 parseParens :: Parser Match Source (Maybe Tree)
@@ -64,9 +65,13 @@ parseStr = locateM . fallible $ do
   eof <- ok $ many $ try $ neg $ liftResult (try $ is '`') <|> end
   need $ try $ is '`'
   let close = '`' : concat eof
-  str <- ok $ many $ try $ neg $ try (string close) <|> end
+  str <- ok $ many $ try $ locateM $ fallible $ do
+    [char] <- need $ neg $ try (string close) <|> end
+    pure $ TreeChar . CharLit char
   need $ try $ string close
-  pure $ TreeStr . StrLit (concat eof) (concat str)
+  pure $ \loc -> case str of
+    [] -> TreeNil $ NilLit loc
+    str -> TreeBrackets (str <> [TreeNil $ NilLit loc]) loc
 
 parseChar :: Parser Match Source (Maybe Tree)
 parseChar = locateM . fallible $ do
@@ -94,6 +99,11 @@ parseSign = try (string $ '+' :| "") <|> try (string $ '-' :| "")
 
 parseNat :: Parser Match Source (Maybe Chars)
 parseNat = some $ try $ satisfy isDigit
+
+parseNil :: Parser Match Source (Maybe Tree)
+parseNil = locateM . fallible $ do
+  need $ try $ string "nil"
+  pure $ TreeNil . NilLit
 
 parseVar :: Parser Match Source (Maybe Tree)
 parseVar = locateM . fallible $ do

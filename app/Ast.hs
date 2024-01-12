@@ -31,10 +31,10 @@ module Ast
     Pat (..),
     Data (..),
     Cons (..),
-    StrLit (..),
     CharLit (..),
     FloatLit (..),
     IntLit (..),
+    NilLit (..),
     Var (..),
     Chars,
     Loc,
@@ -214,10 +214,10 @@ data Pat
 
 data Data a
   = DataCons (Cons a)
-  | DataStr StrLit
   | DataChar CharLit
   | DataFloat FloatLit
   | DataInt IntLit
+  | DataNil NilLit
   | DataVar Var
   deriving (Show)
 
@@ -227,9 +227,6 @@ data Cons a
   | ConsOne Loc
   deriving (Show)
 
-data StrLit = StrLit String String Loc -- "foo"
-  deriving (Show)
-
 data CharLit = CharLit Char Loc -- 'a
   deriving (Show)
 
@@ -237,6 +234,9 @@ data FloatLit = FloatLit Chars Loc -- 3.14
   deriving (Show)
 
 data IntLit = IntLit Chars Loc -- 42
+  deriving (Show)
+
+newtype NilLit = NilLit Loc -- nil
   deriving (Show)
 
 data Var

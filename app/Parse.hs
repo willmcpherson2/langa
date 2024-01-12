@@ -172,10 +172,10 @@ parseData parse ctor = \case
               [] -> a
               b : trees -> ctor . DataCons $ Cons a (go b trees) loc
          in Cons a (go b trees) loc
-  TreeStr str -> Just $ DataStr str
   TreeChar char -> Just $ DataChar char
   TreeFloat float -> Just $ DataFloat float
   TreeInt int -> Just $ DataInt int
+  TreeNil nil -> Just $ DataNil nil
   TreeVar var -> Just $ DataVar var
   _ -> Nothing
 
