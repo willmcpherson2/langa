@@ -79,8 +79,8 @@ parseStr = locateM . fallible $ do
 
 parseChar :: Parser Match Source (Maybe Tree)
 parseChar = locateM . fallible $ do
-  need $ try $ is '\''
-  char <- need stream
+  TreeVar (Var s _) <- need parseVar
+  char <- need $ pure $ readMaybe $ toList s
   pure $ TreeChar . CharLit char
 
 parseFloat :: Parser Match Source (Maybe Tree)
