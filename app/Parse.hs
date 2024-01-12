@@ -124,7 +124,7 @@ parseType = \case
               b : trees -> Fix2 . ExpType . TypeFun $ FunType (Fix2 a) (go b trees) loc
          in FunType (Fix2 a) (go b trees) loc
   TreeVar (Var ('D' :| "o") loc) ->
-    Just . TypeDo $ DoType (Fix2 . ExpTerm $ TermData (DataNat $ NatLit ('0' :| "") loc)) loc
+    Just . TypeDo $ DoType (Fix2 . ExpTerm $ TermData (DataNil $ NilLit loc)) loc
   TreeParens (TreeVar (Var ('D' :| "o") _) : trees) loc ->
     Just . TypeDo $ case trees of
       [] -> DoTypeZero loc
