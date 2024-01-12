@@ -15,6 +15,7 @@ data Tree
   | TreeChar CharLit
   | TreeFloat FloatLit
   | TreeInt IntLit
+  | TreeNat NatLit
   | TreeNil NilLit
   | TreeVar Var
   deriving (Show)
@@ -35,6 +36,7 @@ parseTree = do
     <|> try parseStr
     <|> try parseChar
     <|> try parseFloat
+    <|> try parseNat
     <|> try parseInt
     <|> try parseNil
     <|> try parseVar
@@ -82,23 +84,25 @@ parseChar = locateM . fallible $ do
 parseFloat :: Parser Match Source (Maybe Tree)
 parseFloat = locateM . fallible $ do
   sign <- ok parseSign
-  nat <- need parseNat
+  TreeNat (NatLit nat _) <- need parseNat
   point <- need $ try $ string $ '.' :| ""
-  frac <- need parseNat
+  TreeNat (NatLit frac _) <- need parseNat
   let num = nat <> point <> frac
   pure $ TreeFloat . FloatLit (maybe num (<> num) sign)
 
 parseInt :: Parser Match Source (Maybe Tree)
 parseInt = locateM . fallible $ do
   sign <- ok parseSign
-  nat <- need parseNat
+  TreeNat (NatLit nat _) <- need parseNat
   pure $ TreeInt . IntLit (maybe nat (<> nat) sign)
 
 parseSign :: Parser Match Source (Maybe Chars)
 parseSign = try (string $ '+' :| "") <|> try (string $ '-' :| "")
 
-parseNat :: Parser Match Source (Maybe Chars)
-parseNat = some $ try $ satisfy isDigit
+parseNat :: Parser Match Source (Maybe Tree)
+parseNat = locateM . fallible $ do
+  nat <- need $ some $ try $ satisfy isDigit
+  pure $ TreeNat . NatLit nat
 
 parseNil :: Parser Match Source (Maybe Tree)
 parseNil = locateM . fallible $ do

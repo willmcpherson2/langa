@@ -113,6 +113,7 @@ parseType = \case
   TreeVar (Var ('C' :| "har") loc) -> Just . TypeChar $ CharType loc
   TreeVar (Var ('F' :| "loat") loc) -> Just . TypeFloat $ FloatType loc
   TreeVar (Var ('I' :| "nt") loc) -> Just . TypeInt $ IntType loc
+  TreeVar (Var ('N' :| "at") loc) -> Just . TypeNat $ NatType loc
   TreeParens (TreeVar (Var ('=' :| ">") _) : trees) loc ->
     Just . TypeFun $ case map (unfix2 . parseExp) trees of
       [] -> FunTypeZero loc
@@ -123,7 +124,7 @@ parseType = \case
               b : trees -> Fix2 . ExpType . TypeFun $ FunType (Fix2 a) (go b trees) loc
          in FunType (Fix2 a) (go b trees) loc
   TreeVar (Var ('D' :| "o") loc) ->
-    Just . TypeDo $ DoType (Fix2 . ExpTerm $ TermData (DataInt $ IntLit ('0' :| "") loc)) loc
+    Just . TypeDo $ DoType (Fix2 . ExpTerm $ TermData (DataNat $ NatLit ('0' :| "") loc)) loc
   TreeParens (TreeVar (Var ('D' :| "o") _) : trees) loc ->
     Just . TypeDo $ case trees of
       [] -> DoTypeZero loc
@@ -148,7 +149,7 @@ parseType = \case
               b : trees -> Fix2 . ExpType . TypeFor $ For (parseVar a) (go b trees) loc
          in For (parseVar a) (go b trees) loc
   TreeVar (Var ('T' :| "ype") loc) ->
-    Just . TypeKind $ Kind (Fix2 . ExpTerm $ TermData (DataInt $ IntLit ('0' :| "") loc)) loc
+    Just . TypeKind $ Kind (Fix2 . ExpTerm $ TermData (DataNat $ NatLit ('0' :| "") loc)) loc
   TreeParens (TreeVar (Var ('T' :| "ype") _) : trees) loc ->
     Just . TypeKind $ case trees of
       [] -> KindZero loc
@@ -175,6 +176,7 @@ parseData parse ctor = \case
   TreeChar char -> Just $ DataChar char
   TreeFloat float -> Just $ DataFloat float
   TreeInt int -> Just $ DataInt int
+  TreeNat nat -> Just $ DataNat nat
   TreeNil nil -> Just $ DataNil nil
   TreeVar var -> Just $ DataVar var
   _ -> Nothing

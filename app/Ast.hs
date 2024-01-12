@@ -23,6 +23,7 @@ module Ast
     CharType (..),
     FloatType (..),
     IntType (..),
+    NatType (..),
     FunType (..),
     DoType (..),
     Set (..),
@@ -34,6 +35,7 @@ module Ast
     CharLit (..),
     FloatLit (..),
     IntLit (..),
+    NatLit (..),
     NilLit (..),
     Var (..),
     Chars,
@@ -114,6 +116,7 @@ data Type a
   | TypeChar CharType
   | TypeFloat FloatType
   | TypeInt IntType
+  | TypeNat NatType
   | TypeFun (FunType a)
   | TypeDo (DoType a)
   | TypeSet (Set a)
@@ -128,6 +131,9 @@ newtype FloatType = FloatType Loc -- Float
   deriving (Show)
 
 newtype IntType = IntType Loc -- Int
+  deriving (Show)
+
+newtype NatType = NatType Loc -- Nat
   deriving (Show)
 
 data FunType a
@@ -217,6 +223,7 @@ data Data a
   | DataChar CharLit
   | DataFloat FloatLit
   | DataInt IntLit
+  | DataNat NatLit
   | DataNil NilLit
   | DataVar Var
   deriving (Show)
@@ -233,7 +240,10 @@ data CharLit = CharLit Char Loc -- 'a
 data FloatLit = FloatLit Chars Loc -- 3.14
   deriving (Show)
 
-data IntLit = IntLit Chars Loc -- 42
+data IntLit = IntLit Chars Loc -- -7
+  deriving (Show)
+
+data NatLit = NatLit Chars Loc -- 42
   deriving (Show)
 
 newtype NilLit = NilLit Loc -- nil
