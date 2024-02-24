@@ -18,8 +18,7 @@ report (l, m, r) msg =
           then length $ last $ lines m
           else charStart + length m
       lineEnd = lineStart + length (lines m)
-   in "\n"
-        <> show (lineStart + 1)
+   in show (lineStart + 1)
         <> ":"
         <> show (charStart + 1)
         <> "-"
@@ -38,7 +37,6 @@ report (l, m, r) msg =
         <> "↑"
         <> "\n"
         <> msg
-        <> "\n"
 
 instance (Display a) => Display (Ast a) where
   display items = unlines $ display <$> items
