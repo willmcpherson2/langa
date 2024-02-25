@@ -190,3 +190,23 @@
       [alice bob nil]))
 
 (map (-> user (user "ask" 1)) users) -- (: (List Nat) [43 0 nil])
+
+--------------------------------------------------------------------------------
+-- modules
+
+-- global definition, across files
+(<- a b)
+
+-- local definition, within file
+(= a b)
+
+-- util.langa
+(= id (-> x x))
+(= const (-> x y x))
+(<- util
+    {(-> "id" id)
+     (-> "const" const)})
+
+-- main.langa
+(= const (util "const"))
+(= one (const 1 2))
