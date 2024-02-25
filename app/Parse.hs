@@ -11,25 +11,17 @@ parseAst = map parseItem
 parseItem :: Tree -> Item (Fix2 Exp)
 parseItem = \case
   TreeParens (TreeVar (Var ('<' :| "-") _) : trees) loc ->
-    ItemImport $ case trees of
-      [] -> ImportZero loc
-      name : names -> Import (parseVar name) (map parseVar names) loc
-  TreeParens (TreeVar (Var ('-' :| ">") _) : trees) loc ->
-    ItemExport $ case trees of
-      [] -> ExportZero loc
-      _ -> Export (map parseVar trees) loc
-  TreeBraces trees loc ->
-    ItemDeclare $ case trees of
-      [] -> DeclareZero loc
-      [_] -> DeclareOne loc
-      [name, exp] -> Declare (parseVar name) (parseExp exp) loc
-      _ -> DeclareMore loc
+    ItemGlobal $ case trees of
+      [] -> GlobalZero loc
+      [_] -> GlobalOne loc
+      [name, exp] -> Global (parseVar name) (parseExp exp) loc
+      _ -> GlobalMore loc
   TreeParens (TreeVar (Var ('=' :| "") _) : trees) loc ->
-    ItemDef $ case trees of
-      [] -> DefZero loc
-      [_] -> DefOne loc
-      [name, exp] -> Def (parseVar name) (parseExp exp) loc
-      _ -> DefMore loc
+    ItemLocal $ case trees of
+      [] -> LocalZero loc
+      [_] -> LocalOne loc
+      [name, exp] -> Local (parseVar name) (parseExp exp) loc
+      _ -> LocalMore loc
   tree -> ItemNone $ locate tree
 
 parseExp :: Tree -> Fix2 Exp

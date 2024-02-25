@@ -7,10 +7,8 @@ module Ast
     TypedAst,
     TermAst,
     Item (..),
-    Import (..),
-    Export (..),
-    Declare (..),
-    Def (..),
+    Global (..),
+    Local (..),
     Exp (..),
     Typed (..),
     Term (..),
@@ -60,35 +58,23 @@ type TermAst = Ast (Fix Term) -- term
 --------------------------------------------------------------------------------
 
 data Item a
-  = ItemImport Import
-  | ItemExport Export
-  | ItemDeclare (Declare a)
-  | ItemDef (Def a)
+  = ItemGlobal (Global a)
+  | ItemLocal (Local a)
   | ItemNone Loc
   deriving (Show)
 
-data Import
-  = Import Var [Var] Loc -- (<- name name*)
-  | ImportZero Loc
+data Global a
+  = Global Var a Loc -- (<- name exp)
+  | GlobalZero Loc
+  | GlobalOne Loc
+  | GlobalMore Loc
   deriving (Show)
 
-data Export
-  = Export [Var] Loc -- (-> name*)
-  | ExportZero Loc
-  deriving (Show)
-
-data Declare a
-  = Declare Var a Loc -- {name type}
-  | DeclareZero Loc
-  | DeclareOne Loc
-  | DeclareMore Loc
-  deriving (Show)
-
-data Def a
-  = Def Var a Loc -- (= name exp)
-  | DefZero Loc
-  | DefOne Loc
-  | DefMore Loc
+data Local a
+  = Local Var a Loc -- (= name exp)
+  | LocalZero Loc
+  | LocalOne Loc
+  | LocalMore Loc
   deriving (Show)
 
 --------------------------------------------------------------------------------
@@ -282,8 +268,8 @@ noLoc = ([], [], [])
 -- (= id (: (A a (=> a a)) (-> x x)))
 expAst :: ExpAst
 expAst =
-  [ ItemDef $
-      Def
+  [ ItemLocal $
+      Local
         (Var ('i' :| "d") noLoc)
         ( Fix2 . ExpTyped $
             Typed
@@ -315,8 +301,8 @@ expAst =
 -- (= id (: (A a (=> a a)) (-> x x)))
 typedAst :: TypedAst
 typedAst =
-  [ ItemDef $
-      Def
+  [ ItemLocal $
+      Local
         (Var ('i' :| "d") noLoc)
         ( ExpTyped $
             Typed
@@ -348,8 +334,8 @@ typedAst =
 -- (= id (-> x x))
 termAst :: TermAst
 termAst =
-  [ ItemDef $
-      Def
+  [ ItemLocal $
+      Local
         (Var ('i' :| "d") noLoc)
         ( Fix . TermFun $
             Fun

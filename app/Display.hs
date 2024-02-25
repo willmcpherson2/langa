@@ -43,35 +43,23 @@ instance (Display a) => Display (Ast a) where
 
 instance (Display a) => Display (Item a) where
   display = \case
-    ItemImport imprt -> display imprt
-    ItemExport export -> display export
-    ItemDeclare declare -> display declare
-    ItemDef def -> display def
+    ItemGlobal imprt -> display imprt
+    ItemLocal def -> display def
     ItemNone loc -> report loc "Expected item"
 
-instance Display Import where
+instance (Display a) => Display (Global a) where
   display = \case
-    Import var vars _ -> "(<- " <> unwords (display <$> var : vars) <> ")"
-    ImportZero loc -> report loc "Expected import list"
+    Global var exp _ -> "(<- " <> display var <> " " <> display exp <> ")"
+    GlobalZero loc -> report loc "Expected variable and expression"
+    GlobalOne loc -> report loc "Expected variable and expression"
+    GlobalMore loc -> report loc "Expected variable and expression"
 
-instance Display Export where
+instance (Display a) => Display (Local a) where
   display = \case
-    Export vars _ -> "(-> " <> unwords (display <$> vars) <> ")"
-    ExportZero loc -> report loc "Expected export list"
-
-instance (Display a) => Display (Declare a) where
-  display = \case
-    Declare var ty _ -> "{" <> display var <> " " <> display ty <> "}"
-    DeclareZero loc -> report loc "Expected variable and expression"
-    DeclareOne loc -> report loc "Expected variable and expression"
-    DeclareMore loc -> report loc "Expected variable and expression"
-
-instance (Display a) => Display (Def a) where
-  display = \case
-    Def var exp _ -> "(= " <> display var <> " " <> display exp <> ")"
-    DefZero loc -> report loc "Expected variable and expression"
-    DefOne loc -> report loc "Expected variable and expression"
-    DefMore loc -> report loc "Expected variable and expression"
+    Local var exp _ -> "(= " <> display var <> " " <> display exp <> ")"
+    LocalZero loc -> report loc "Expected variable and expression"
+    LocalOne loc -> report loc "Expected variable and expression"
+    LocalMore loc -> report loc "Expected variable and expression"
 
 instance (Display a, Display b) => Display (Exp a b) where
   display = \case
