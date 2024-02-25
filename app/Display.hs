@@ -4,6 +4,8 @@ module Display (Display (..)) where
 
 import Ast
 import Data.List.NonEmpty (toList)
+import Tree
+import Data.List (intercalate)
 
 class Display a where
   display :: a -> String
@@ -37,6 +39,21 @@ report (l, m, r) msg =
         <> "↑"
         <> "\n"
         <> msg
+
+instance Display [Tree] where
+  display = intercalate "\n" . map display
+
+instance Display Tree where
+  display = \case
+    TreeParens trees _ -> "(" <> unwords (map display trees) <> ")"
+    TreeBrackets trees _ -> "[" <> unwords (map display trees) <> "]"
+    TreeBraces trees _ -> "{" <> unwords (map display trees) <> "}"
+    TreeChar char -> display char
+    TreeFloat float -> display float
+    TreeInt int -> display int
+    TreeNat nat -> display nat
+    TreeNil nil -> display nil
+    TreeVar var -> display var
 
 instance (Display a) => Display (Ast a) where
   display items = unlines $ display <$> items

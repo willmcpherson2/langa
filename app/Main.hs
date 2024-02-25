@@ -31,6 +31,7 @@ repl = do
 
       putStrLn "Trees:"
       print $ trees pipeline
+      putStrLn $ display $ trees pipeline
 
       putStrLn "Ast:"
       print $ ast pipeline
