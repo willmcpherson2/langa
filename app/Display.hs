@@ -43,8 +43,8 @@ instance (Display a) => Display (Ast a) where
 
 instance (Display a) => Display (Item a) where
   display = \case
-    ItemGlobal imprt -> display imprt
-    ItemLocal def -> display def
+    ItemGlobal global -> display global
+    ItemLocal local -> display local
     ItemNone loc -> report loc "Expected item"
 
 instance (Display a) => Display (Global a) where
