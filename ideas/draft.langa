@@ -1,116 +1,116 @@
---------------------------------------------------------------------------------
--- types
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; types
 
--- self type (all terms can type themselves, tautology)
+;; self type (all terms can type themselves, tautology)
 (: x x)
 
--- types of terms
-(: (=> 1 0)            (-> 1 0))            -- function
-(: (=> {1 0} {0 1})    {(-> 1 0) (-> 0 1)}) -- function of sets
-(: {(=> 1 0) (=> 0 1)} {(-> 1 0) (-> 0 1)}) -- set of functions
-(: {1 0}               1)                   -- set
-(: (Do String)         (do x read read))    -- IO binding
-(: 1                   (= x 1 x))           -- let binding
-(: 0                   ((-> 1 0) 1))        -- application
-(: [Int Float]         [42 3.14])           -- product
-(: [Char Char nil]     "hi")                -- string
-(: Char                'a')                 -- char
-(: Float               3.14)                -- float
-(: Int                 -7)                  -- int
-(: Nat                 42)                  -- nat
-(: nil                 nil)                 -- unit
-(: 1                   one)                 -- variable
+;; types of terms
+(: (=> 1 0)            (-> 1 0))            ;; function
+(: (=> {1 0} {0 1})    {(-> 1 0) (-> 0 1)}) ;; function of sets
+(: {(=> 1 0) (=> 0 1)} {(-> 1 0) (-> 0 1)}) ;; set of functions
+(: {1 0}               1)                   ;; set
+(: (Do String)         (do x read read))    ;; IO binding
+(: 1                   (= x 1 x))           ;; let binding
+(: 0                   ((-> 1 0) 1))        ;; application
+(: [Int Float]         [42 3.14])           ;; product
+(: [Char Char nil]     "hi")                ;; string
+(: Char                'a')                 ;; char
+(: Float               3.14)                ;; float
+(: Int                 -7)                  ;; int
+(: Nat                 42)                  ;; nat
+(: nil                 nil)                 ;; unit
+(: 1                   one)                 ;; variable
 
--- cumulative type universes
+;; cumulative type universes
 (: (Type (+ n 1)) (Type n))
 
--- polymorphism
+;; polymorphism
 (A a (: (=> a a) (-> x x)))
 
---------------------------------------------------------------------------------
--- inference
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; inference
 
-(-> x x) -- term
+(-> x x) ;; term
 
 (A a
-   (: (=> a a)   -- type
-      (-> x x))) -- term
+   (: (=> a a)   ;; type
+      (-> x x))) ;; term
 
 (A n
-   (: (Type n) a) -- kind
-   (: (=> a a)    -- type
-      (-> x x)))  -- term
+   (: (Type n) a) ;; kind
+   (: (=> a a)    ;; type
+      (-> x x)))  ;; term
 
-(A (: Nat n)      -- level
-   (: (Type n) a) -- kind
-   (: (=> a a)    -- type
-      (-> x x)))  -- term
+(A (: Nat n)      ;; level
+   (: (Type n) a) ;; kind
+   (: (=> a a)    ;; type
+      (-> x x)))  ;; term
 
---------------------------------------------------------------------------------
--- lambda cube
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lambda cube
 
--- simple typing (terms depend on terms)
+;; simple typing (terms depend on terms)
 
 (= id
    (: (=> Nat Nat)
       (-> x x)))
 
-(id 1) -- (: Nat 1)
+(id 1) ;; (: Nat 1)
 
--- polymorphism (terms depend on types)
+;; polymorphism (terms depend on types)
 
 (= id
    (A a
       (: (=> a a)
          (-> x x))))
 
-(id 'a') -- (: Char 'a')
+(id 'a') ;; (: Char 'a')
 
--- type constructors (types depend on types)
+;; type constructors (types depend on types)
 
 (= List
    (: (=> Type Type)
       (-> a {nil [a (List a)]})))
 
--- this type is infinite! but evaluation is lazy
-(List Nat) -- {nil [Nat {nil [Nat ...]}]}
+;; this type is infinite! but evaluation is lazy
+(List Nat) ;; {nil [Nat {nil [Nat ...]}]}
 
--- dependent types (types depend on terms)
+;; dependent types (types depend on terms)
 
 (= Vec
    (: (=> Nat Type)
       {(-> 0 nil)
        (-> n [Nat (Vec (- n 1))])}))
 
-(Vec 3) -- [Nat Nat Nat nil]
+(Vec 3) ;; [Nat Nat Nat nil]
 
---------------------------------------------------------------------------------
--- structural control flow
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; structural control flow
 
--- the idea of structural control flow is that control flow is
--- achieved through sets of functions, and sets are structurally
--- typed, so control flow is also structurally typed.
+;; the idea of structural control flow is that control flow is
+;; achieved through sets of functions, and sets are structurally
+;; typed, so control flow is also structurally typed.
 
--- this set of functions
+;; this set of functions
 {(-> 1 2) (-> 3 4)}
--- has the type
+;; has the type
 {(=> 1 2) (=> 3 4)}
 
--- in the same way that a function can be applied, so can a set of functions.
--- we select the first function from the set that is applicable.
--- here, 1 matches 1, so the result is 2
+;; in the same way that a function can be applied, so can a set of functions.
+;; we select the first function from the set that is applicable.
+;; here, 1 matches 1, so the result is 2
 ({(-> 1 2) (-> n (+ n 1))} 1)
--- here, 1 does not match 1, but n (wildcard) does match 42, so we get (+ 42 1)
+;; here, 1 does not match 1, but n (wildcard) does match 42, so we get (+ 42 1)
 ({(-> 1 2) (-> n (+ n 1))} 42)
 
--- the most precise type of the set above is
+;; the most precise type of the set above is
 {(=> 1 2) (=> Nat Nat)}
--- however, (=> 1 2) is a subtype of (=> Nat Nat), so we can also write:
+;; however, (=> 1 2) is a subtype of (=> Nat Nat), so we can also write:
 {(=> Nat Nat) (=> Nat Nat)}
--- which is equivalent to:
+;; which is equivalent to:
 (=> Nat Nat)
 
--- the return type of `if` is allowed to vary
+;; the return type of `if` is allowed to vary
 (= if
    (A a b
       (: {(=> "true" a b a)
@@ -118,62 +118,62 @@
          {(-> "true" x y x)
           (-> "false" x y y)})))
 
--- argument type "true", so result is Float
+;; argument type "true", so result is Float
 (: Float (if "true" 3.14 42))
 
--- argument type {"true" "false"}, so result is {Float Nat}
+;; argument type {"true" "false"}, so result is {Float Nat}
 (: {Float Nat} (if x 3.14 42))
 
--- structurally aware `not`
+;; structurally aware `not`
 (= not
    (: {(=> "true" "false")
        (=> "false" "true")}
       {(-> "true" "false")
        (-> "false" "true")}))
 
---------------------------------------------------------------------------------
--- dependent functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; dependent functions
 
--- we use universal quantification to create dependent functions
--- the return type depends on the argument type
+;; we use universal quantification to create dependent functions
+;; the return type depends on the argument type
 
 (= paired
    (A (: Bool a)
       (: (=> a (if a [Nat Nat] Nat))
          (-> x (if x [1 2] 0)))))
 
-(paired "true") -- (: [Nat Nat] [1 2])
-(paired "false") -- (: Nat 0)
+(paired "true") ;; (: [Nat Nat] [1 2])
+(paired "false") ;; (: Nat 0)
 
---------------------------------------------------------------------------------
--- subtyping
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; subtyping
 
--- structural typing of sets enables subtyping
+;; structural typing of sets enables subtyping
 
--- User supertype
+;; User supertype
 (= User
    {(=> "name" String)
     (=> "id" Nat)
     (=> "ask" Nat Nat)})
 
--- Alice subtype with no variance, so it's actually invariant (aka type synonym)
+;; Alice subtype with no variance, so it's actually invariant (aka type synonym)
 (= Alice User)
 
--- Alice object
+;; Alice object
 (= alice
    (: Alice
       {(-> "name" "Alice")
        (-> "id" 1)
        (-> "ask" n (+ n 42))}))
 
--- Bob subytpe with invariance, covariance, contravariance and extension
+;; Bob subytpe with invariance, covariance, contravariance and extension
 (= Bob
-   {(=> "name" String)   -- same as supertype (invariance)
-    (=> "id" 2)          -- output type 2 is a subtype of Nat (covariance)
-    (=> "bob" String)    -- extension
-    (=> String Nat Nat)} -- input String is a supertype of "ask" (contravariance)
+   {(=> "name" String)    ;; same as supertype (invariance)
+    (=> "id" 2)           ;; output type 2 is a subtype of Nat (covariance)
+    (=> "bob" String)     ;; extension
+    (=> String Nat Nat)}) ;; input String is a supertype of "ask" (contravariance)
 
--- Bob object
+;; Bob object
 (= bob
    (: Bob
       {(-> "name" "Bob")
@@ -181,32 +181,32 @@
        (-> "bob" "Yes, this is Bob.")
        (-> s n 0)}))
 
-(alice "ask" 1) -- 43
-(bob "ask" 1)   -- 0
-(bob "bob")     -- "Yes, this is Bob."
+(alice "ask" 1) ;; 43
+(bob "ask" 1)   ;; 0
+(bob "bob")     ;; "Yes, this is Bob."
 
 (= users
    (: (List User)
       [alice bob nil]))
 
-(map (-> user (user "ask" 1)) users) -- (: (List Nat) [43 0 nil])
+(map (-> user (user "ask" 1)) users) ;; (: (List Nat) [43 0 nil])
 
---------------------------------------------------------------------------------
--- modules
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; modules
 
--- global definition, across files
+;; global definition, across files
 (<- a b)
 
--- local definition, within file
+;; local definition, within file
 (= a b)
 
--- util.langa
+;; util.langa
 (= id (-> x x))
 (= const (-> x y x))
 (<- util
     {(-> "id" id)
      (-> "const" const)})
 
--- main.langa
+;; main.langa
 (= const (util "const"))
 (= one (const 1 2))
