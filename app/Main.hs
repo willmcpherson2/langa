@@ -24,8 +24,13 @@ repl = do
   if input == "exit"
     then return ()
     else do
-      putStrLn "Data:"
-      putStrLn $ display $ ast $ run input
+      let pipeline = run input
+      putStrLn "Trees:"
+      print $ trees pipeline
+      putStrLn "Ast:"
+      print $ ast pipeline
+      putStrLn "Pretty:"
+      putStrLn $ display $ ast pipeline
       repl
 
 main :: IO ()
