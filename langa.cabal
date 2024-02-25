@@ -35,6 +35,7 @@ executable langa
     Tree
     , Ast
     , Parse
+    , Check
     , Locate
     , Display
   build-depends:

@@ -4,10 +4,12 @@ import Ast
 import Parse
 import Tree
 import Display
+import Check
 
 data Pipeline = Pipeline
   { trees :: [Tree],
-    ast :: ExpAst
+    ast :: ExpAst,
+    checked :: TermAst
   }
   deriving (Show)
 
@@ -15,7 +17,8 @@ run :: String -> Pipeline
 run s =
   let trees = parseTrees s
       ast = parseAst trees
-   in Pipeline {trees, ast}
+      checked = checkAst ast
+   in Pipeline {trees, ast, checked}
 
 repl :: IO ()
 repl = do
@@ -25,12 +28,18 @@ repl = do
     then return ()
     else do
       let pipeline = run input
+
       putStrLn "Trees:"
       print $ trees pipeline
+
       putStrLn "Ast:"
       print $ ast pipeline
-      putStrLn "Pretty:"
-      putStrLn $ display $ ast pipeline
+      putStr $ display $ ast pipeline
+
+      putStrLn "Checked:"
+      print $ checked pipeline
+      putStrLn $ display $ checked pipeline
+
       repl
 
 main :: IO ()
