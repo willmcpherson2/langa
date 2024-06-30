@@ -8,24 +8,21 @@ common common
     LambdaCase
   ghc-options:
     -Weverything
-    -Wno-implicit-prelude
-    -Wno-name-shadowing
-    -Wno-unsafe
-    -Wno-missing-import-lists
-    -Wno-unused-do-bind
-    -Wno-missed-specialisations
     -Wno-all-missed-specialisations
-    -Wno-monomorphism-restriction
+    -Wno-implicit-prelude
+    -Wno-missed-specialisations
+    -Wno-missing-deriving-strategies
+    -Wno-missing-import-lists
+    -Wno-missing-kind-signatures
     -Wno-missing-local-signatures
+    -Wno-missing-role-annotations
+    -Wno-missing-safe-haskell-mode
+    -Wno-monomorphism-restriction
+    -Wno-name-shadowing
+    -Wno-prepositive-qualified-module
     -Wno-safe
-  if impl(ghc >= 8.8.1)
-    ghc-options: -Wno-missing-deriving-strategies
-  if impl(ghc >= 8.10)
-    ghc-options: -Wno-prepositive-qualified-module
-  if impl(ghc >= 8.10.1)
-    ghc-options: -Wno-missing-safe-haskell-mode
-  if impl(ghc >= 9.2)
-    ghc-options: -Wno-missing-kind-signatures
+    -Wno-unsafe
+    -Wno-unused-do-bind
 
 executable langa
   import: common
