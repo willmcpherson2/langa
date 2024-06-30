@@ -1,10 +1,10 @@
 module Main (main, run) where
 
 import Ast
+import Check
+import Display
 import Parse
 import Tree
-import Display
-import Check
 
 data Pipeline = Pipeline
   { trees :: [Tree],

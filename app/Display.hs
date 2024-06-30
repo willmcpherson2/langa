@@ -3,9 +3,9 @@
 module Display (Display (..)) where
 
 import Ast
+import Data.List (intercalate)
 import Data.List.NonEmpty (toList)
 import Tree
-import Data.List (intercalate)
 
 class Display a where
   display :: a -> String
