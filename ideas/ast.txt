@@ -1,0 +1,29 @@
+item
+  (<- var typed)
+  (= var typed)
+
+typed
+  (: exp exp)
+  (A var exp typed)
+
+exp
+  (Set typed typed)
+  (=> typed typed)
+  (Do typed)
+  Float
+  Int
+  Nat
+  Char
+  Type
+  (? typed typed)
+  (-> typed typed)
+  (do typed typed typed)
+  (= typed typed typed)
+  (typed typed)
+  [typed typed]
+  3.14
+  -7
+  42
+  'a'
+  nil
+  var
