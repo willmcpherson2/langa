@@ -8,8 +8,8 @@ import Tree
 
 data Pipeline = Pipeline
   { trees :: [Tree],
-    ast :: ExpAst,
-    checked :: TermAst
+    ast :: Ast,
+    checked :: Ast
   }
   deriving (Show)
 
