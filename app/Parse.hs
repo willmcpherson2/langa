@@ -77,6 +77,7 @@ parseExp = \case
   TreeVar (Var ('N' :| "at") loc) -> TypeNat $ NatType loc
   TreeVar (Var ('C' :| "har") loc) -> TypeChar $ CharType loc
   TreeVar (Var ('T' :| "ype") loc) -> TypeType $ Type loc
+  TreeVar (Var ('#' :| "") loc) -> TypeInfer $ Infer 0 loc
   TreeParens (TreeVar (Var ('-' :| ">") _) : trees) loc ->
     TermFun $ case map parseTyped trees of
       [] -> FunZero loc
@@ -139,7 +140,7 @@ parseExp = \case
   TreeInt int -> ExpInt int
   TreeNat nat -> ExpNat nat
   TreeChar char -> ExpChar char
-  TreeNil nil -> ExpNil nil
+  TreeVar (Var ('n' :| "il") loc) -> ExpNil $ NilLit loc
   TreeVar var -> ExpVar $ parseVar (TreeVar var)
   tree -> ExpNone $ locate tree
 
@@ -151,4 +152,4 @@ parseVar = \case
 inferred :: Exp -> Typed
 inferred exp =
   let loc = locate exp
-   in TypedAnn $ Ann (ExpVar $ Var ('#' :| "") loc) exp loc
+   in TypedAnn $ Ann (TypeInfer $ Infer 0 loc) exp loc

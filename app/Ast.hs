@@ -15,6 +15,7 @@ module Ast
     NatType (..),
     CharType (..),
     Type (..),
+    Infer (..),
     Case (..),
     Fun (..),
     Do (..),
@@ -93,6 +94,7 @@ data Exp
   | TypeNat NatType
   | TypeChar CharType
   | TypeType Type
+  | TypeInfer Infer
   | TermCase Case
   | TermFun Fun
   | TermDo Do
@@ -139,6 +141,9 @@ newtype CharType = CharType Loc -- Char
   deriving (Show)
 
 newtype Type = Type Loc -- Type
+  deriving (Show)
+
+data Infer = Infer Int Loc -- #
   deriving (Show)
 
 data Fun

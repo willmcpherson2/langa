@@ -3,7 +3,7 @@ module Tree (Tree (..), parseTrees) where
 import Ast
 import Control.Monad (guard)
 import Data.Char (isSpace)
-import Data.List.NonEmpty (nonEmpty, toList)
+import Data.List.NonEmpty (nonEmpty, toList, NonEmpty (..))
 import Parss.Combinators
 import Parss.Parser
 import Parss.Stream
@@ -18,7 +18,6 @@ data Tree
   | TreeFloat FloatLit
   | TreeInt IntLit
   | TreeNat NatLit
-  | TreeNil NilLit
   | TreeVar Var
   deriving (Show)
 
@@ -40,7 +39,6 @@ parseTree = do
     <|> try parseNat
     <|> try parseInt
     <|> try parseFloat
-    <|> try parseNil
     <|> try parseVar
 
 parseParens :: Parser Match Source (Maybe Tree)
@@ -74,8 +72,8 @@ parseStr = locateM . fallible $ do
     pure $ TreeChar . CharLit char
   need $ try $ string close
   pure $ \loc -> case str of
-    [] -> TreeNil $ NilLit loc
-    str -> TreeBrackets (str <> [TreeNil $ NilLit loc]) loc
+    [] -> TreeVar (Var ('n' :| "il") loc)
+    str -> TreeBrackets (str <> [TreeVar (Var ('n' :| "il") loc)]) loc
 
 parseChar :: Parser Match Source (Maybe Tree)
 parseChar = locateM . fallible $ do
@@ -101,11 +99,6 @@ parseFloat = locateM . fallible $ do
   TreeVar (Var s _) <- need parseVar
   float <- need $ pure $ readMaybe $ toList s
   pure $ TreeFloat . FloatLit float
-
-parseNil :: Parser Match Source (Maybe Tree)
-parseNil = locateM . fallible $ do
-  need $ try $ string "nil"
-  pure $ TreeNil . NilLit
 
 parseVar :: Parser Match Source (Maybe Tree)
 parseVar = locateM . fallible $ do

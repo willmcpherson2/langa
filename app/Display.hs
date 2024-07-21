@@ -50,7 +50,6 @@ instance Display Tree where
     TreeFloat float -> display float
     TreeInt int -> display int
     TreeNat nat -> display nat
-    TreeNil nil -> display nil
     TreeVar var -> display var
 
 instance Display Ast where
@@ -106,6 +105,7 @@ instance Display Exp where
     TypeNat nat -> display nat
     TypeChar char -> display char
     TypeType ty -> display ty
+    TypeInfer infer -> display infer
     TermCase cas -> display cas
     TermFun fun -> display fun
     TermDo d -> display d
@@ -152,6 +152,9 @@ instance Display CharType where
 
 instance Display Type where
   display _ = "Type"
+
+instance Display Infer where
+  display (Infer n _) = "#" <> show n
 
 instance Display Case where
   display = \case

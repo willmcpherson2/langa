@@ -15,7 +15,6 @@ instance Locate Tree where
     TreeFloat (FloatLit _ loc) -> loc
     TreeInt (IntLit _ loc) -> loc
     TreeNat (NatLit _ loc) -> loc
-    TreeNil (NilLit loc) -> loc
     TreeVar (Var _ loc) -> loc
     TreeVar (VarNone loc) -> loc
 
@@ -35,6 +34,7 @@ instance Locate Exp where
     TypeNat (NatType loc) -> loc
     TypeChar (CharType loc) -> loc
     TypeType (Type loc) -> loc
+    TypeInfer (Infer _ loc) -> loc
     TermCase (Case _ _ loc) -> loc
     TermCase (CaseZero loc) -> loc
     TermCase (CaseOne loc) -> loc
