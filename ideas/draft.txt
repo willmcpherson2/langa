@@ -5,46 +5,24 @@
 (: x x)
 
 ;; types of terms
-(: (=> 1 0)            (-> 1 0))              ;; function
-(: (=> {1 0} {0 1})    (? (-> 1 0) (-> 0 1))) ;; function of sets
-(: {(=> 1 0) (=> 0 1)} (? (-> 1 0) (-> 0 1))) ;; set of functions
-(: {1 0}               1)                     ;; set
-(: (Do String)         (do x read read))      ;; IO binding
-(: 1                   (= x 1 x))             ;; let binding
-(: 0                   ((-> 1 0) 1))          ;; application
-(: [Int Float]         [42 3.14])             ;; product
-(: [Char Char nil]     "hi")                  ;; string
-(: Char                'a')                   ;; char
-(: Float               3.14)                  ;; float
-(: Int                 -7)                    ;; int
-(: Nat                 42)                    ;; nat
-(: nil                 nil)                   ;; unit
-(: 1                   one)                   ;; variable
-
-;; cumulative type universes
-(: (Type (+ n 1)) (Type n))
+(: (=> 1 0)                 (-> 1 0))              ;; function
+(: (=> (Set 1 0) (Set 0 1)) (? (-> 1 0) (-> 0 1))) ;; function of sets
+(: (Set (=> 1 0) (=> 0 1))  (? (-> 1 0) (-> 0 1))) ;; set of functions
+(: (Set 1 0)                1)                     ;; set
+(: (Do String)              (do x read read))      ;; IO binding
+(: 1                        (= x 1 x))             ;; let binding
+(: 0                        ((-> 1 0) 1))          ;; application
+(: [Int Float]              [42 3.14])             ;; product
+(: [Char Char nil]          "hi")                  ;; string
+(: Float                    3.14)                  ;; float
+(: Int                      -7)                    ;; int
+(: Nat                      42)                    ;; nat
+(: Char                     'a')                   ;; char
+(: nil                      nil)                   ;; unit
+(: 1                        one)                   ;; variable
 
 ;; polymorphism
-(A a (: (=> a a) (-> x x)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; inference
-
-(-> x x) ;; term
-
-(A a
-   (: (=> a a)   ;; type
-      (-> x x))) ;; term
-
-(A n
-   (: (Type n) a) ;; kind
-   (: (=> a a)    ;; type
-      (-> x x)))  ;; term
-
-(A (: Nat n)      ;; level
-   (: (Type n) a) ;; kind
-   (: (=> a a)    ;; type
-      (-> x x)))  ;; term
+(A a Type (: (=> a a) (-> x x)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lambda cube
@@ -60,7 +38,7 @@
 ;; polymorphism (terms depend on types)
 
 (= id
-   (A a
+   (A a Type
       (: (=> a a)
          (-> x x))))
 
@@ -70,19 +48,19 @@
 
 (= List
    (: (=> Type Type)
-      (-> a {nil [a (List a)]})))
+      (-> a (Set nil [a (List a)]))))
 
 ;; this type is infinite! but evaluation is lazy
-(List Nat) ;; {nil [Nat {nil [Nat ...]}]}
+(List Nat) ;; (Set nil [Nat (Set nil [Nat ...])])
 
 ;; dependent types (types depend on terms)
 
 (= Vec
-   (: (=> Nat Type)
-      (? (-> 0 nil)
-         (-> n [Nat (Vec (- n 1))]))))
+   (: (=> Nat Type Type)
+      (? (-> 0 a nil)
+         (-> n a [a (Vec (- n 1) a)]))))
 
-(Vec 3) ;; [Nat Nat Nat nil]
+(Vec 3 Char) ;; [Char Char Char nil]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; structural control flow
@@ -94,7 +72,7 @@
 ;; this set of functions
 (? (-> 1 2) (-> 3 4))
 ;; has the type
-{(=> 1 2) (=> 3 4)}
+(Set (=> 1 2) (=> 3 4))
 
 ;; in the same way that a function can be applied, so can a set of functions.
 ;; we select the first function from the set that is applicable.
@@ -104,30 +82,30 @@
 ((? (-> 1 2) (-> n (+ n 1))) 42)
 
 ;; the most precise type of the set above is
-{(=> 1 2) (=> Nat Nat)}
+(Set (=> 1 2) (=> Nat Nat))
 ;; however, (=> 1 2) is a subtype of (=> Nat Nat), so we can also write:
-{(=> Nat Nat) (=> Nat Nat)}
+(Set (=> Nat Nat) (=> Nat Nat))
 ;; which is equivalent to:
 (=> Nat Nat)
 
 ;; the return type of `if` is allowed to vary
 (= if
    (A a b
-      (: {(=> "true" a b a)
-          (=> "false" a b b)}
+      (: (Set (=> "true" a b a)
+              (=> "false" a b b))
          (? (-> "true" x y x)
             (-> "false" x y y)))))
 
 ;; argument type "true", so result is Float
 (: Float (if "true" 3.14 42))
 
-;; argument type {"true" "false"}, so result is {Float Nat}
-(: {Float Nat} (if x 3.14 42))
+;; argument type (Set "true" "false"), so result is (Set Float Nat)
+(: (Set Float Nat) (if x 3.14 42))
 
 ;; structurally aware `not`
 (= not
-   (: {(=> "true" "false")
-       (=> "false" "true")}
+   (: (Set (=> "true" "false")
+           (=> "false" "true"))
       (? (-> "true" "false")
          (-> "false" "true"))))
 
@@ -138,7 +116,7 @@
 ;; the return type depends on the argument type
 
 (= paired
-   (A (: Bool a)
+   (A a Bool
       (: (=> a (if a [Nat Nat] Nat))
          (-> x (if x [1 2] 0)))))
 
@@ -152,9 +130,9 @@
 
 ;; User supertype
 (= User
-   {(=> "name" String)
-    (=> "id" Nat)
-    (=> "ask" Nat Nat)})
+   (Set (=> "name" String)
+        (=> "id" Nat)
+        (=> "ask" Nat Nat)))
 
 ;; Alice subtype with no variance, so it's actually invariant (aka type synonym)
 (= Alice User)
@@ -168,10 +146,10 @@
 
 ;; Bob subytpe with invariance, covariance, contravariance and extension
 (= Bob
-   {(=> "name" String)    ;; same as supertype (invariance)
-    (=> "id" 2)           ;; output type 2 is a subtype of Nat (covariance)
-    (=> "bob" String)     ;; extension
-    (=> String Nat Nat)}) ;; input String is a supertype of "ask" (contravariance)
+   (Set (=> "name" String)    ;; same as supertype (invariance)
+        (=> "id" 2)           ;; output type 2 is a subtype of Nat (covariance)
+        (=> "bob" String)     ;; extension
+        (=> String Nat Nat))) ;; input String is a supertype of "ask" (contravariance)
 
 ;; Bob object
 (= bob
@@ -204,8 +182,8 @@
 (= id (-> x x))
 (= const (-> x y x))
 (<- util
-    {(-> "id" id)
-     (-> "const" const)})
+    (? (-> "id" id)
+       (-> "const" const)))
 
 ;; main.langa
 (= const (util "const"))
