@@ -3,7 +3,7 @@ module Tree (Tree (..), parseTrees) where
 import Ast
 import Control.Monad (guard)
 import Data.Char (isSpace)
-import Data.List.NonEmpty (nonEmpty, toList, NonEmpty (..))
+import Data.List.NonEmpty (NonEmpty (..), nonEmpty, toList)
 import Parss.Combinators
 import Parss.Parser
 import Parss.Stream

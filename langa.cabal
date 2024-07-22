@@ -38,3 +38,4 @@ executable langa
   build-depends:
     base
     , parss
+    , optparse-applicative >= 0.18

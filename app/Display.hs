@@ -53,7 +53,7 @@ instance Display Tree where
     TreeVar var -> display var
 
 instance Display Ast where
-  display items = unlines $ display <$> items
+  display items = intercalate "\n" $ display <$> items
 
 instance Display Item where
   display = \case
