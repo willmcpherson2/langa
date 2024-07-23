@@ -87,7 +87,6 @@ instance Display Ann where
     Ann ty exp _ -> "(: " <> display ty <> " " <> display exp <> ")"
     AnnZero loc -> report loc "Expected type and expression"
     AnnOne loc -> report loc "Expected type and expression"
-    AnnMore loc -> report loc "Expected type and expression"
 
 instance Display For where
   display = \case
