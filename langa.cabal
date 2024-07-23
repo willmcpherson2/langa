@@ -36,8 +36,8 @@ executable langa
     , Locate
     , Display
   build-depends:
-    base
+    base == 4.19.1.0
     , parss
-    , optparse-applicative >= 0.18
-    , mtl
-    , uniplate
+    , optparse-applicative == 0.18.1.0
+    , mtl == 2.3.1
+    , uniplate == 1.6.13
