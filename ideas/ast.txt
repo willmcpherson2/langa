@@ -15,6 +15,7 @@ exp
   Nat
   Char
   Type
+  #
   (? typed typed)
   (-> typed typed)
   (do typed typed typed)
