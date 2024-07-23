@@ -30,8 +30,11 @@ parseTyped = \case
     TypedAnn $ case trees of
       [] -> AnnZero loc
       [_] -> AnnOne loc
-      [ty, exp] -> Ann (parseTyped ty) (parseExp exp) loc
-      _ -> AnnMore loc
+      a : b : trees ->
+        let go a = \case
+              [] -> a
+              b : trees -> go (Ann (TypedAnn a) (parseExp b) loc) trees
+         in go (Ann (parseTyped a) (parseExp b) loc) trees
   TreeParens (TreeVar (Var ('A' :| "") _) : trees) loc ->
     TypedFor $ case trees of
       [] -> ForZero loc

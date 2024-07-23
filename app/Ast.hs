@@ -74,7 +74,6 @@ data Ann
   = Ann Typed Exp Loc -- (: typed exp)
   | AnnZero Loc
   | AnnOne Loc
-  | AnnMore Loc
   deriving (Show)
 
 data For
