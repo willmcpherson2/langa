@@ -118,6 +118,7 @@ instance Display Exp where
     ExpInt int -> display int
     ExpNat nat -> display nat
     ExpChar char -> display char
+    ExpSym sym -> display sym
     ExpNil nil -> display nil
     ExpVar var -> display var
     ExpNone loc -> report loc "Expected expression"
@@ -204,6 +205,9 @@ instance Display NatLit where
 
 instance Display CharLit where
   display (CharLit char _) = "'" <> [char] <> "'"
+
+instance Display SymLit where
+  display (SymLit sym _) = ":" <> sym
 
 instance Display NilLit where
   display (NilLit _) = "nil"

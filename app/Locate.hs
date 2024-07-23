@@ -58,6 +58,7 @@ instance Locate Exp where
     ExpInt (IntLit _ loc) -> loc
     ExpNat (NatLit _ loc) -> loc
     ExpChar (CharLit _ loc) -> loc
+    ExpSym (SymLit _ loc) -> loc
     ExpNil (NilLit loc) -> loc
     ExpVar (Var _ loc) -> loc
     ExpVar (VarNone loc) -> loc

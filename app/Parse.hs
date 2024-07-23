@@ -143,6 +143,7 @@ parseExp = \case
   TreeInt int -> ExpInt int
   TreeNat nat -> ExpNat nat
   TreeChar char -> ExpChar char
+  TreeVar (Var (':' :| sym) loc) -> ExpSym $ SymLit sym loc
   TreeVar (Var ('n' :| "il") loc) -> ExpNil $ NilLit loc
   TreeVar var -> ExpVar $ parseVar (TreeVar var)
   tree -> ExpNone $ locate tree

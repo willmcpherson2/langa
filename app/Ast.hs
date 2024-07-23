@@ -26,6 +26,7 @@ module Ast
     IntLit (..),
     NatLit (..),
     CharLit (..),
+    SymLit (..),
     NilLit (..),
     Var (..),
     Chars,
@@ -107,6 +108,7 @@ data Exp
   | ExpInt IntLit
   | ExpNat NatLit
   | ExpChar CharLit
+  | ExpSym SymLit
   | ExpNil NilLit
   | ExpVar Var
   | ExpNone Loc
@@ -193,6 +195,9 @@ data NatLit = NatLit Int Loc -- 42
   deriving (Show)
 
 data CharLit = CharLit Char Loc -- 'a'
+  deriving (Show)
+
+data SymLit = SymLit String Loc -- :foo
   deriving (Show)
 
 newtype NilLit = NilLit Loc -- nil
