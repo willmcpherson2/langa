@@ -66,11 +66,12 @@ data Local
 data Typed
   = TypedAnn Ann
   | TypedFor For
+  | TypedType Type
   | TypedNone Loc
   deriving (Show)
 
 data Ann
-  = Ann Exp Exp Loc -- (: exp exp)
+  = Ann Typed Exp Loc -- (: typed exp)
   | AnnZero Loc
   | AnnOne Loc
   | AnnMore Loc
@@ -83,6 +84,9 @@ data For
   | ForTwo Loc
   deriving (Show)
 
+newtype Type = Type Loc -- Type
+  deriving (Show)
+
 --------------------------------------------------------------------------------
 
 data Exp
@@ -93,7 +97,6 @@ data Exp
   | TypeInt IntType
   | TypeNat NatType
   | TypeChar CharType
-  | TypeType Type
   | TypeInfer Infer
   | TermCase Case
   | TermFun Fun
@@ -138,9 +141,6 @@ newtype NatType = NatType Loc -- Nat
   deriving (Show)
 
 newtype CharType = CharType Loc -- Char
-  deriving (Show)
-
-newtype Type = Type Loc -- Type
   deriving (Show)
 
 data Infer = Infer Int Loc -- #

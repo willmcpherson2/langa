@@ -30,7 +30,7 @@ parseTyped = \case
     TypedAnn $ case trees of
       [] -> AnnZero loc
       [_] -> AnnOne loc
-      [ty, exp] -> Ann (parseExp ty) (parseExp exp) loc
+      [ty, exp] -> Ann (parseTyped ty) (parseExp exp) loc
       _ -> AnnMore loc
   TreeParens (TreeVar (Var ('A' :| "") _) : trees) loc ->
     TypedFor $ case trees of
@@ -43,6 +43,7 @@ parseTyped = \case
               [_] -> TypedFor $ ForOne loc
               b : c : trees -> TypedFor $ For (parseVar a) (parseExp b) (go c trees) loc
          in For (parseVar a) (parseExp b) (go c trees) loc
+  TreeVar (Var ('T' :| "ype") loc) -> TypedType $ Type loc
   tree -> inferred $ parseExp tree
 
 parseExp :: Tree -> Exp
@@ -76,7 +77,6 @@ parseExp = \case
   TreeVar (Var ('I' :| "nt") loc) -> TypeInt $ IntType loc
   TreeVar (Var ('N' :| "at") loc) -> TypeNat $ NatType loc
   TreeVar (Var ('C' :| "har") loc) -> TypeChar $ CharType loc
-  TreeVar (Var ('T' :| "ype") loc) -> TypeType $ Type loc
   TreeVar (Var ('#' :| "") loc) -> TypeInfer $ Infer 0 loc
   TreeParens (TreeVar (Var ('-' :| ">") _) : trees) loc ->
     TermFun $ case map parseTyped trees of
@@ -152,4 +152,5 @@ parseVar = \case
 inferred :: Exp -> Typed
 inferred exp =
   let loc = locate exp
-   in TypedAnn $ Ann (TypeInfer $ Infer 0 loc) exp loc
+   in -- (: Type #0 exp)
+      TypedAnn $ Ann (TypedAnn $ Ann (TypedType $ Type loc) (TypeInfer $ Infer 0 loc) loc) exp loc

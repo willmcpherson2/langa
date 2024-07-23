@@ -79,6 +79,7 @@ instance Display Typed where
   display = \case
     TypedAnn ann -> display ann
     TypedFor for -> display for
+    TypedType ty -> display ty
     TypedNone loc -> report loc "Expected typed expression"
 
 instance Display Ann where
@@ -95,6 +96,9 @@ instance Display For where
     ForOne loc -> report loc "Expected pattern and two expressions"
     ForTwo loc -> report loc "Expected pattern and two expressions"
 
+instance Display Type where
+  display _ = "Type"
+
 instance Display Exp where
   display = \case
     TypeSet set -> display set
@@ -104,7 +108,6 @@ instance Display Exp where
     TypeInt int -> display int
     TypeNat nat -> display nat
     TypeChar char -> display char
-    TypeType ty -> display ty
     TypeInfer infer -> display infer
     TermCase cas -> display cas
     TermFun fun -> display fun
@@ -149,9 +152,6 @@ instance Display NatType where
 
 instance Display CharType where
   display _ = "Char"
-
-instance Display Type where
-  display _ = "Type"
 
 instance Display Infer where
   display (Infer n _) = "#" <> show n

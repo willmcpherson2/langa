@@ -33,7 +33,6 @@ instance Locate Exp where
     TypeInt (IntType loc) -> loc
     TypeNat (NatType loc) -> loc
     TypeChar (CharType loc) -> loc
-    TypeType (Type loc) -> loc
     TypeInfer (Infer _ loc) -> loc
     TermCase (Case _ _ loc) -> loc
     TermCase (CaseZero loc) -> loc

@@ -3,8 +3,9 @@ item
   (= var typed)
 
 typed
-  (: exp exp)
+  (: typed exp)
   (A var exp typed)
+  Type
 
 exp
   (Set typed typed)
@@ -14,7 +15,6 @@ exp
   Int
   Nat
   Char
-  Type
   #
   (? typed typed)
   (-> typed typed)
